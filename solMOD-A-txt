@@ -1,0 +1,113 @@
+
+#include unordered_map
+#include unordered_set
+struct Duro {
+    using ID = std::string
+    ID asignatura
+    int horas_estimadas
+    int horas_actuales
+    Date fechaExamen
+
+    ID getID{
+        return asignatura
+    }
+}
+template <typename T>
+class Negrata {
+    using ID = T::ID
+
+    void insertarAsignatura(ID id, Date date, int horas, std::list Dependencias) {
+        Duro nuevo {id, horas, 0 , date};
+        nodos[id] = nuevo;
+        for (const auto& elem : Dependencias){
+            nodos.contains(elem.getID()) ? ListaAdj[id].insert(elem) : throw Exception;
+        }
+    }
+    void insertarDepend(T a, T b){
+        ListaAdj[a.getID()].insert(b)
+
+    }
+    auto devolverAdj(T a){
+        ListaAdj[a.getID()]
+    }
+
+    bool relacionHoras(T a) {
+        auto set = devolverAdj(a)
+        int horas = a.horas_estimadas - a.horas_actuales
+        for (const auto& val : set){
+            horas -= val.horas_actuales
+        } 
+        return horas >= 0
+
+    }
+
+    void aumentarHoras(std::list<ID> lista, std::list<int> horas) {
+        for (const auto& elem: lista){
+            nodos[elem].horas_actuales += horas.pop_front()
+        } 
+    }
+    
+    void aumentarHoras(std::list<ID> lista, std::list<date> fecha) {
+        for (const auto& elem: lista){
+            nodos[elem].fechaExamen = horas.pop_front()
+        } 
+    }
+
+
+
+    private: 
+        std::unordered_map<ID, T> nodos
+        std::unordered_map<ID, std::unordered_set<T>> ListaAdj
+}
+
+
+
+template <typename T>
+void equilibrio(T tree) {
+    using Nodo = T::Node
+    using Tipo = T::Type 
+    auto root = tree.getRoot()
+    equilibrioNodo(root)
+
+}
+
+int equilibrioNodo(Node* nodo) {
+    if (!nodo){
+        return 0
+    }
+    auto left = getLeft(nodo)
+    auto right = getRight(nodo)
+
+    if (!(left && right)) return 1
+
+    int equilibrioIzq = equilibrioNodo(left)
+    
+    int equilibrioDer = equilibrioNodo(right)
+
+    if (isRoot(nodo)){
+        return abs(equilibrioDer - equilibrioIzq) > 1
+    }
+
+    return equilibrioDer + equilibrioIzq
+}
+
+int equilibrioArbol(Node* nodo = const getRoot()) {
+     if (!nodo){
+        return 0
+    }
+
+    auto left = getLeft(nodo)
+    auto right = getRight(nodo)
+
+    if !(left || right) return 1
+    if !(right && left) return -1
+
+    izq = equilibrioArbol(left)
+    der = equilibrioArbol(right)
+    
+    if (der == -1 || izq == -1) return -1
+    if (equilibrioDer * 2 > equilibrioIzq ||  equilibrioDer / 2) return -1 
+
+    return izq + der
+
+}
