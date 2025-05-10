@@ -1,0 +1,1132 @@
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Introducción a los árboles
+●   Modelo abstracto de una estructura jerárquica.
+
+
+
+●   Un árbol está formado por nodos con una relación padre-hijo
+
+
+                                                             W
+
+
+
+●   Aplicaciones                                         S       D
+
+
+     ○   Flujos en organizaciones
+                                                     I
+
+     ○   Sistemas de ﬁcheros
+     ○   Entornos de programación
+     ○   etc.
+Introducción a los árboles
+                                   Raíz: ...
+                   A
+
+
+
+       B       C       D       E
+
+
+
+   H       G               F
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+
+
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: ...
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+  Hoja
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: ...
+
+
+
+
+  Raíz
+  Hoja
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: Nodo con, al menos, un hijo.
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: Nodo con, al menos, un hijo.
+
+                                         Ancestros: ...
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                         Raíz: Nodo sin padre.
+                         A
+
+                                                         Hoja: Nodo sin hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+                                                         Interno: Nodo con, al menos, un hijo.
+
+                                                         Ancestros: Padres, Abuelos, etc.
+
+
+
+
+  Raíz
+  Hoja                           Ancestros de F: D y A
+  Interno
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: Nodo con, al menos, un hijo.
+
+                                         Ancestros: Padres, Abuelos, etc.
+
+                                         Descendiente: ...
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                            Raíz: Nodo sin padre.
+                         A
+
+                                                            Hoja: Nodo sin hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+                                                            Interno: Nodo con, al menos, un hijo.
+
+                                                            Ancestros: Padres, Abuelos, etc.
+
+                                                            Descendiente: hijo, nieto, etc.
+
+
+  Raíz
+  Hoja                           Descendiente de B: H y G
+  Interno
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: Nodo con, al menos, un hijo.
+
+                                         Ancestros: Padres, Abuelos, etc.
+
+                                         Descendiente: hijo, nieto, etc.
+
+                                         Profundidad: ...
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                       Raíz: Nodo sin padre.
+                         A
+
+                                                       Hoja: Nodo sin hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+                                                       Interno: Nodo con, al menos, un hijo.
+
+                                                       Ancestros: Padres, Abuelos, etc.
+
+                                                       Descendiente: hijo, nieto, etc.
+
+                                                       Profundidad: nº ancestros (nivel - 1).
+  Raíz
+  Hoja                           Profundidad de G: 2
+  Interno
+Introducción a los árboles
+                                         Raíz: Nodo sin padre.
+                         A
+
+                                         Hoja: Nodo sin hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Interno: Nodo con, al menos, un hijo.
+
+                                         Ancestros: Padres, Abuelos, etc.
+
+                                         Descendiente: hijo, nieto, etc.
+
+                                         Profundidad: nº ancestros (nivel - 1).
+  Raíz
+  Hoja
+                                         Altura: ...
+  Interno
+Introducción a los árboles
+                                             Raíz: Nodo sin padre.
+                         A
+
+                                             Hoja: Nodo sin hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+                                             Interno: Nodo con, al menos, un hijo.
+
+                                             Ancestros: Padres, Abuelos, etc.
+
+                                             Descendiente: hijo, nieto, etc.
+
+                                             Profundidad: nº ancestros (nivel - 1).
+  Raíz
+  Hoja                           Altura: 3
+                                             Altura: nivel máximo del árbol.
+  Interno
+Introducción a los árboles
+                                         Hermanos: ...
+                         A
+
+
+
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                      Hermanos: Nodos con el mismo padre.
+                         A
+
+
+
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+  Hoja                           H y G son Hermanos
+  Interno
+Introducción a los árboles
+                                         Hermanos: Nodos con el mismo padre.
+                         A
+
+                                         Grado de un Nodo: ...
+             B       C       D       E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                      Hermanos: Nodos con el mismo padre.
+                         A
+
+                                                      Grado de un Nodo: número de hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+
+
+
+
+  Raíz
+  Hoja                           El grado de B es 2
+  Interno
+Introducción a los árboles
+                                         Hermanos: Nodos con el mismo padre.
+                         A
+
+                                         Grado de un Nodo: número de hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Grado de un Árbol: ...
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                                           Hermanos: Nodos con el mismo padre.
+                         A
+
+                                                           Grado de un Nodo: número de hijos.
+             B       C       D        E
+
+
+
+         H       G               F
+                                                           Grado de un Árbol: mayor grado.
+
+
+
+
+  Raíz
+  Hoja                           El grado del árbol es 4
+  Interno
+Introducción a los árboles
+                                         Hermanos: Nodos con el mismo padre.
+                         A
+
+                                         Grado de un Nodo: número de hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Grado de un Árbol: mayor grado.
+
+                                         Sub-árbol: ...
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Introducción a los árboles
+                                         Hermanos: Nodos con el mismo padre.
+                         A
+
+                                         Grado de un Nodo: número de hijos.
+             B       C       D       E
+
+
+
+         H       G               F
+                                         Grado de un Árbol: mayor grado.
+
+                                         Sub-árbol: un nodo y sus descendientes.
+
+
+
+
+  Raíz
+  Hoja
+
+  Interno
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Operaciones sobre árboles
+●   Básicas                                    void isEmpty(Tree t);
+     ○   isEmpty: devuelve si es vacío.
+                                               Iterator add(T element, parent=nullptr);
+●   Construcción
+                                               // insertar raiz
+     ○   Add: diferenciar entre raíz y nodo.
+                                               // r = add(3);
+     ○   Cut: devuelve un sub-árbol.
+                                               // insertar nodo no raiz
+     ○   Attach: añade un sub-árbol.
+                                               // h1 = add(4, *r);
+●   Acceso
+●   Consulta                                   Tree cut(Node node);
+
+                                               Iterator attach(Node node, Tree, t);
+Operaciones sobre árboles
+●   Básicas                                            Iterator Root();
+
+●   Construcción
+                                                       Iterator Parent(Node node);
+●   Acceso
+     ○   Root: devuelve la raíz.                       Iterator Children(Node node);
+     ○   Padre: devuelve el nodo padre.
+     ○   Children: devuelve un iterador a los hijos.   bool isRoot(Node node);
+●   Consulta
+     ○   isRoot: devuelve si es la raíz.               bool isLeaf(Node node);
+     ○   isLeaf: devuelve si es hoja.
+     ○   isInternal: devuelve si no es hoja.           bool isInternal(Node node);
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Árboles N-arios
+●   Árboles con N hijos.
+                                   W
+
+
+
+                               S       D
+
+
+
+                           I       J       M   Q
+LinkedTree
+●   Cada nodo contiene:
+     ○       El elemento                       W
+     ○       Referencia al padre
+     ○       Referencia a colección de hijos       S   D
+
+
+
+
+                                                   I   J   M   Q
+                    W
+
+
+
+                S        D
+
+
+
+         I           J        M       Q
+LCRSTree
+●   Cada nodo contiene:                                W
+
+     ○       El elemento
+     ○       Referencia al padre
+     ○       Referencia al primer hijo
+                                                   S           D
+     ○       Referencia al siguiente hermano
+
+
+
+                    W                          I           J       M   Q
+
+                S       D
+
+
+
+         I          J        M       Q
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Recorridos
+                                  void preorder(Tree t) {
+                                         auto root = t.getRoot();
+                      A
+                                         visit(root);
+                                         for(auto& h: t.children(root)) {
+          B               D   E
+                                                 preorder(h);
+      H       G       F
+                                         }
+                                  }
+                  C
+
+                                  void postorder(Tree t) {
+                                         auto root = t.getRoot();
+                                         for(auto& h: t.children(root)) {
+●   Preorden                                     postorder(h);
+                                         }
+●   Postorden                            visit(root);
+                                  }
+Recorridos
+                                  void preorder(Tree t) {
+                                         auto root = t.getRoot();
+                      A
+                                         visit(root);
+                                         for(auto& h: t.children(root)) {
+          B               D   E
+                                                 preorder(h);
+      H       G       F
+                                         }
+                                  }
+                  C
+
+                                  void postorder(Tree t) {
+                                         auto root = t.getRoot();
+                                         for(auto& h: t.children(root)) {
+●   Preorden                                     postorder(h);
+                                         }
+●   Postorden                            visit(root);
+                                  }
+Recorridos
+                                  void preorder(Tree t) {
+                                         auto root = t.getRoot();
+                      A
+                                         visit(root);
+                                         for(auto& h: t.children(root)) {
+          B               D   E
+                                                 preorder(h);
+      H       G       F
+                                         }
+                                  }
+                  C
+
+                                  void postorder(Tree t) {
+                                         auto root = t.getRoot();
+                                         for(auto& h: t.children(root)) {
+●   Preorden                                     postorder(h);
+                                         }
+●   Postorden                            visit(root);
+                                  }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Recorridos
+                                                 void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                        A
+                                                        visit(root);
+                                                        for(auto& h: t.children(root)) {
+          B                 D        E
+                                                                preorder(h);
+      H       G         F
+                                                        }
+                                                 }
+                  C
+
+                                                 void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        for(auto& h: t.children(root)) {
+●   Preorden          {A, B, H, G, C, D, F, E}                  postorder(h);
+                                                        }
+●   Postorden         {H, C, G, B, F, D, E, A}          visit(root);
+                                                 }
+Índice
+●   Introducción a los árboles
+●   Operaciones generales
+●   Árbol N-ario
+     ○   LinkedTree
+     ○   LCRSTree (Left Child Right Sibling Tree)
+●   Recorridos
+     ○   Iteradores personalizados
+●   Árbol Binario
+     ○   Linked Binary Tree
+     ○   Array Binary Tree
+     ○   Montículo
+Árbol binario
+●   Un árbol n-ario en el que cada nodo tiene como máximo 2 hijos.
+
+
+
+●   Árbol binario no solo es un árbol con dos nodos como máximo, hay un hijo
+    izquierdo y un hijo derecho.
+                                                          W
+
+
+
+                                                      S       D
+
+
+●   Es más fácil pensar como una estructura       I
+
+
+    recursiva.
+Árbol binario
+●   Ejemplos de uso son los árboles de expresión o los de decisión.
+
+
+
+●   Idealmente el número de nodos crece exponencialmente con la altura.
+
+
+                                                           W
+
+
+
+●   Árbol binario completo: Todos los nodos            S       D
+
+
+    internos tienen 2 hijos.                       I
+Árbol binario
+●   Árbol binario completo.                                        W
+
+     ○   n: número de nodos
+                                                       S                       X
+     ○   e: número de hojas
+     ○   i: número de nodos internos           I               A       L           Q
+
+
+     ○   h: altura del árbol
+
+                                           W
+●   Se cumple:
+     ○   e=i+1                         V           X
+
+
+
+     ○   n = i + e = 2e - 1                L               Q
+
+     ○   h<n
+                                                   D               S
+     ○   h≤e
+                                                           I               A
+LinkedBinaryTree
+●   Cada nodo contiene:                             W
+
+     ○       El elemento
+     ○       Referencia al padre
+     ○       Referencia al hijo izquierdo
+                                                S           D
+     ○       Referencia al hijo derecho
+
+
+
+                    W                       I           J       M
+
+                S        D
+
+
+
+         I           J        M
+ArrayBinaryTree
+●   La posición de cada elemento establece la relación:
+     ○       La raíz está en la posición 0.
+     ○       Sea i la posición de un nodo:
+              ■ Su hijo izquierdo está en la posición 2 * i + 1.
+              ■ Su hijo derecho está en la posición 2 * i + 2.
+
+                                                0      1     2     3   4   5   6   7
+                    W                           W      S     D     I   -   J   M   -
+                S        D
+
+
+
+         I           J        M
+Recorridos
+                                              void preorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        visit(root);
+                        A
+                                                        preorder(hi);
+                                                        preorder(hd);
+          B                 D                 }
+
+
+      H       G         F                     void postorder(Tree t) {
+                                                        auto root = t.getRoot();
+                                                        postorder(hi);
+                  C
+                                                        postorder(hd);
+                                                        visit(root);
+                                              }
+
+
+                                              void inorder(Tree t) {
+●   Preorden          {A, B, H, G, C, D, F}           auto root = t.getRoot();
+●   Postorden         {H, C, G, B, F, D, A}           inorder(hi);
+                                                      visit(root);
+●   Inorden           {H, B, G, C, A, F, D}           inorder(hd);
+                                              }
+Motículo
+●   Árbol binario que se construye en orden y es casi completo:
+     ○   Antes de comenzar un nivel se completa el nivel anterior.
+
+
+
+
+●   Todo nodo es mayor que sus hijos.
+
+
+
+●   Suele implementarse con un ArrayBinaryTree.
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+
+
+
+                                           0      1    2      3   4   5   6
+                  W                        W      S     J     I   M   -   -
+         S              J
+
+
+
+     I        M
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+
+
+
+                                            0      1     2      3      4     5      6
+                  W                         W      S      J      I     M     D       -
+         S                J
+
+
+
+     I        M       D
+                                  Insertamos D y como es menor que su padre, terminamos.
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+
+
+
+                                            0       1     2      3       4     5   6
+                  W                         W       S      J      I     M      D   Z
+         S                J
+
+
+
+     I        M       D       Z
+                                  Insertamos Z pero es mayor que su padre...
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+                                                               padre = (i -1) / 2;
+
+                                            0      1     2      3       4       5    6
+                  W                         W      S      Z      I      M       D    J
+         S                Z
+
+
+
+     I        M       D       J
+                                  Insertamos Z pero es mayor que su padre, intercambiamos.
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+                                              padre = (i -1) / 2;
+
+                                            0       1       2       3   4     5      6
+                  Z                          Z      S       W       I   M     D      J
+         S                W
+
+
+
+     I        M       D       J
+                                  Pero sigue siendo mayor que su padre, intercambiamos.
+Montículo
+●   Inserción:
+     ○   Se inserta en la siguiente posición libre.
+     ○   Si el nodo es mayor que su padre, se intercambian:
+           ■ Se propaga hasta llegar a la raíz.
+
+
+
+                                           0      1    2      3   4   5   6
+                  Z                         Z     S    W      I   M   D   J
+         S                W
+
+
+
+     I        M       D       J
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                          0      1    2     3     4     5     6
+                 Z                         Z     S    W      I    M     D      J
+         S               W
+
+
+
+     I       M       D       J
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                            0      1      2      3       4    5   6
+                 -                           -      S     W       I      M    D   J
+         S               W
+
+
+
+     I       M       D       J
+                                 Se sustituye por el último nodo insertado.
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                            0      1      2      3       4    5   6
+                 J                          J       S     W       I      M    D   -
+         S               W
+
+
+
+     I       M       D       -
+                                 Se sustituye por el último nodo insertado.
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                            0      1      2       3      4      5       6
+                 J                           J      S     W        I     M       D      -
+         S               W
+
+
+
+     I       M       D
+                                 Se sustituye por el hijo más grande hasta cumplir la condición.
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                            0       1      2       3       4   5   6
+                 W                          W       S       J          I   M   D   -
+         S               J
+
+
+
+     I       M       D
+                                 Si se cumple la condición, se para.
+Montículo
+●   Borrado:
+     ○   Se borra la raíz.
+     ○   Se sustituye por el último nodo:
+          ■ Se sustituye por su hijo más grande hasta que se cumple la condición de inserción.
+
+
+
+                                            0       1      2       3       4   5   6
+                 W                          W       S       J          I   M   D   -
+         S               J
+
+
+
+     I       M       D
+                                 Si se cumple la condición, se para.
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+

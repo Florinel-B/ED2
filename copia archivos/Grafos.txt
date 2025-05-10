@@ -1,0 +1,544 @@
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+Índice
+●   Introducción a los grafos
+●   Matriz de adyacencia
+●   Lista de adyacencia
+     ○   Tablas hash
+●   Algoritmos sobre grafos
+     ○   Recorridos
+     ○   Otros
+Introducción a los grafos
+●   Un grafo G es un par ordenado G=(V, A), donde V es un conjunto de vértices o
+    nodos y A es un conjunto de aristas o arcos.
+
+
+
+●   Aunque V puede ser inﬁnito, nos limitaremos a grafos ﬁnitos.
+
+
+                              W
+
+
+
+                     S                D
+
+
+
+
+                          I       N
+Introducción a los grafos
+●   El siguiente grafo puede expresarse con los   V = {W, S, D, I N}
+
+    siguientes conjuntos:
+                                                  A = {a1, a2, a3, a4, a5}
+
+                W                                 a1=(W, S)
+                                                  a2 = (S, I)
+       S                D
+                                                  a3 = (I, W)
+                                                  a4 = (N, W)
+            I       N
+                                                  a5 = (W, D)
+Introducción a los grafos
+●   Dos grafos G=(V, A) y G’=(V’, A’) se dicen isomorfos si existe una biyección f tal
+    que (u, v)∈A si y solo si (f(u), f(v))∈A’.
+●   Un arista incide en un vértice si el vértice forma parte
+                                                                                 W
+
+    del par que deﬁne la arista.
+                                                                        S                D
+
+●   Dos aristas son adyacentes si tienen un vértice en común.
+●   Dos vértices son adyacentes o vecinos si existe una arista               I       N
+
+    que los une.
+●   Un bucle es una arista que conecta un vértice consigo mismo.
+Introducción a los grafos
+●   Si en un grafo las aristas no son simétricas, si existe la arista (W, S) no implica
+    que exista la arista (S, W), se dice que el grafo es un grafo dirigido o digrafo.
+                                                                                    W
+
+
+
+                                                                          S                 D
+
+
+●   Una arista (W, S) se dice que W es su vértice inicial y S su
+    vértice ﬁnal.                                                               I       N
+
+
+
+
+●   Algunos autores proponen que los digrafos no pueden contener bucles, otros
+    llaman digrafos simples a los digrafos sin bucles.
+Introducción a los grafos
+●   En un digrafo se dice que una arista incide en un vértice si es el vértice ﬁnal.
+
+
+                                                                                  W
+
+
+●   Un nodo Vj es adyacente a otro nodo Vi si (Vi, Vj)∈A.                S                 D
+
+
+
+
+                                                                              I        N
+
+
+
+
+●   Dos grafos son isomorfos bajo el mismo criterio. Esto implica
+    que se respetan las direcciones de las aristas.
+Introducción a los grafos
+●   Un camino es una secuencia ordenada de nodos adyacentes y las aristas que los
+    unen. Si existe un camino entre dos nodos N y D, se dice que D es
+    accesible por N.
+                                                                            W
+
+
+
+                                                                   S                D
+
+
+
+
+●   Al número de aristas dentro de un camino se le denomina             I       N
+
+
+
+    longitud.
+
+
+
+●   Un ciclo es un camino que empieza y termina en el mismo nodos sin repetir
+    nodos intermedios.
+Introducción a los grafos
+●   La clausura o cierre transitivo de un grafo G(V, A) es otro grafo G+(V, A+) tal que
+    para todo par (N1, N2) en V hay un arco en A+ si y solo si N2 es accesible desde
+    N1.
+
+
+                       W
+                                                                    W
+
+
+              S                D
+                                                           S                D
+
+
+
+
+                   I       N
+                                                                I       N
+Introducción a los grafos
+●   En un grafo no dirigido, el grado de un vértice es igual al número de vértices
+    adyacentes, contando los bucles como 2.
+                                                                                          W
+
+
+
+                                                                                  S               D
+
+
+
+●   En un grafo dirigido se diferencia entre:
+     ○   grado de entrada: Número de aristas que tienen al vértice como ﬁnal.         I       N
+
+
+     ○   grado de salida: Número de aristas que tienen al vértice como inicial.
+                                                                                          W
+
+
+
+                                                                                  S               D
+
+
+
+
+                                                                                      I       N
+Introducción a los grafos
+●   En un grafo no dirigido se dice conexo si entre cada par de vértices existe un
+    camino que los une.
+                                                                               W
+
+
+
+                                                                      S                D
+
+
+
+●   Un grafo dirigido es fuertemente conexo si para cada
+    par de vértices A y B, existe un camino de A hacia B                   I       N
+
+
+
+
+    y de B hacia A.
+                                                                               W
+
+
+
+                                                                      S                D
+
+
+
+
+                                                                           I       N
+Introducción a los grafos
+●   En un grafo plano aquel que se puede dibujar en un plano cartesiano sin cruzar
+    aristas.
+
+
+
+●   Un árbol es un grafo conexo sin ciclos.
+
+
+                     W                                                 W
+
+
+
+            S                D                                 S               D
+
+
+
+
+                 I       N                                         N       I
+Introducción a los grafos
+●   Dado un grafo G’=(V’, A’) es un subgrafo de G=(V, A) si y solo si se veriﬁca que:
+     ○   A’⊆A
+     ○   V’⊆V
+
+
+
+
+●   Un árbol se dice que es árbol de expansión o generador del grafo G si es un
+    subgrafo de G que contiene todos los vértices de G.
+
+                     W                                           W
+
+
+
+            S                D                          S                D
+
+
+
+
+                 I       N                                   I       N
+Introducción a los grafos
+●   Los grafos ponderados (valorados o con pesos) adjuntan a cada arista un valor
+    (peso o coste)
+
+
+
+●   El peso de una arista se suele ver como el coste asociado a transitar entre
+    vértices vecinos.
+
+                           W                                          W
+                1ms              2ms                        1€             2€
+
+            S                          D               S                           D
+                                1ms                                       1€
+                          4ms                                        4€
+            5ms                                        5€
+                      I           N                              I             N
+Introducción a los grafos
+       2
+
+                    1       2       3       4
+   1        4
+
+
+       3
+
+
+                                        2
+
+                                4
+   1   4        5
+                                                1
+
+
+
+   2   3        6                       3
+Introducción a los grafos
+       2
+
+                    4       1       3       2
+   1        4
+
+
+       3
+
+
+                                        2
+
+                                4
+   1   4        5
+                                                1
+
+
+
+   2   3        6                       3
+Matriz de adyacencia
+●   Es una matriz en la que ﬁlas y columnas representan a los nodos y cualquier
+    elemento de la matriz aij representa el peso de los arcos cuyos extremos son
+    (Vi, Vj).
+
+
+                                                                 W       S       D       I       N
+●   En los grafos no dirigidos la relación de adyacencia
+                                                             W       0       1       1       1       1
+    es simétrica                  W
+                                                             S       1       0       0       1       0
+                         S                D
+                                                             D       1       0       0       0       0
+
+                                                             I       1       1       0       1       0
+                              I       N
+
+
+                                                             N       1       0       0       0       0
+Matriz de adyacencia
+●   Es una matriz en la que ﬁlas y columnas representan a los nodos y cualquier
+    elemento de la matriz aij representa el peso de los arcos cuyos extremos son
+    (Vi, Vj).
+
+
+                                                                 W       S       D       I       N
+●   En los digrafos la relación de adyacencia no tiene
+                                                             W       0       1       1       1       0
+    porque ser simétrica          W
+                                                             S       0       0       0       1       0
+                         S                D
+                                                             D       0       0       0       0       0
+
+                                                             I       0       0       0       1       0
+                              I       N
+
+
+                                                             N       1       0       0       0       0
+Lista de adyacencia
+●   Un grafo es una lista de vértices en la que cada vértice se guarda una lista con
+    sus aristas (de salida).                    W
+                                                      S      D       I      N
+
+                                               S
+●   Ideal cuando los grafos están lejos               W       I
+    de ser completos.                          D
+
+                                   W
+                                                      W
+
+                         S                 D
+                                               I
+                                                      W       S      I
+                               I       N       N
+                                                      W
+Índice
+●   Introducción a los grafos
+●   Matriz de adyacencia
+●   Lista de adyacencia
+     ○   Tablas hash
+●   Algoritmos sobre grafos
+     ○   Recorridos
+     ○   Otros
+Recorrido en profundidad
+●   Permite visitar todo los nodos del grafo conexo.
+
+
+
+●   Procede profundizando por un camino hasta llegar a un punto en el que no es
+    posible continuar, vuelve un paso atrás y explora otra alternativa.
+
+
+
+●   El recorrido obtenido no es homogéneo, caminos de la misma longitud no se
+    exploran en instantes consecutivos.
+Recorrido en profundidad
+●   Se necesita:
+     ○   Una estructura para la solución (por ejemplo una lista).
+     ○   Un conjunto de visitados.
+     ○   Una pila para la exploración.
+     ○   Inicialmente todas las estructuras están vacías.
+●   Algoritmo:
+     ○   Se inserta el nodo inicial en la pila.
+     ○   Mientras haya elementos en la pila:
+          ■ Se extrae la cima.
+          ■ Si ya está visitado, se descarta.
+          ■ Si no está visitado:
+                 ● Se marca como visitado.
+                 ● Se añade a la solución.
+                 ● Se añaden sus adyacencias a la pila.
+Recorrido en anchura
+●   Permite visitar todo los nodos del grafo conexo.
+
+
+
+●   Se recorren todos los nodos adyacentes a uno dado antes de profundizar más
+    en el grafo.
+
+
+
+●   El recorrido obtenido es homogéneo, ya que caminos de la misma longitud se
+    exploran en instantes consecutivos.
+Recorrido en profundidad
+●   Se necesita:
+     ○   Una estructura para la solución (por ejemplo una lista).
+     ○   Un conjunto de visitados.
+     ○   Una cola para la exploración.
+     ○   Inicialmente todas las estructuras están vacías.
+●   Algoritmo:
+     ○   Se inserta el nodo inicial en la cola.
+     ○   Mientras haya elementos en la cola:
+          ■ Se extrae el primero.
+          ■ Si ya está visitado, se descarta.
+          ■ Si no está visitado:
+                 ● Se marca como visitado.
+                 ● Se añade a la solución.
+                 ● Se añaden sus adyacencias a la cola.
+Índice
+●   Introducción a los grafos
+●   Matriz de adyacencia
+●   Lista de adyacencia
+     ○   Tablas hash
+●   Algoritmos sobre grafos
+     ○   Recorridos
+     ○   Otros
+Camino más corto
+●   El recorrido en anchura permite obtener el camino más corto de un nodo al
+    resto en grafos no ponderados.
+
+
+
+●   Para grafos ponderados se redeﬁne como camino de menor coste.
+
+
+
+●   Dijkstra permite encontrar el camino de menor coste en grafos sin aristas
+    negativas. Bellman-Ford es una solución más general para aristas negativas.
+Camino más corto - Dijkstra
+●   Se necesita:
+     ○   Una tabla con una ﬁla por nodo. Por cada nodo:
+           ■ Distancia para llegar a él (inicialmente inﬁnito).    Nodo       Dist.    Visitado   Previo
+           ■ Un conjunto de visitados (inicialmente false).          A         ∞        False        -
+           ■ Nodo previo (inicialmente nulo).
+     ○   Una cola de prioridad de tuplas para la exploración.        B         ∞        False        -
+     ○   Inicialmente todas las estructuras están vacías.
+                                                                    …          ∞        False        -
+●   Algoritmo:
+     ○   Se inserta la arista inicial con coste cero y su nodo previo nulo en la cola de prioridad.
+     ○   Mientras haya elementos en la cola de prioridad:
+          ■ Se extrae el primero.
+          ■ Se añade a la solución y se marca como visitado.
+          ■ Por cada arista:
+                 ● Si el coste de llegar al nodo más el de la arista es menor que el acumulado, se añade a
+                      la cola de prioridad.
+Camino más corto - BellmanFord
+●   Se necesita:
+     ○   Una tabla con una ﬁla por nodo. Por cada nodo:
+          ■ Distancia para llegar a él (inicialmente inﬁnito).              Nodo         Dist.   Previo
+          ■ Nodo previo (inicialmente nulo).                                  A           ∞        -
+●   Algoritmo:
+                                                                             B            ∞        -
+     ○   Se marca el nodo inicial como coste cero y su nodo previo nulo.
+     ○   Repetir N-1 veces:                                                  …            ∞        -
+          ■ Por cada arista del grafo:
+                ● La arista conecta u con v.
+                ● Si distancia[v] > distancia[u] + peso(u, v).
+                       ○ Se actualiza su distancia y se marca u como su nodo previo.
+     ○   Por cada arista del grafo:
+                ● Si se sigue cumpliendo que distancia[v] > distancia[u] + peso(u, v):
+                       ○ No hay solución, hay ciclos negativos
+Árbol de expansión mínimo
+●   El árbol de expansión mínimo de un grafo con pesos, es un árbol que contiene
+    todos los nodos del grafo y minimiza la suma de los pesos.
+
+
+
+●   Dos algoritmos voraces clásicos para resolver este problema son:
+
+     ○   Kruskal
+
+     ○   Prim
+Árbol de expansión mínimo - Kruskal
+●   Se necesita:
+     ○   Una estructura con las aristas ordenadas por peso.
+     ○   Una estructura con un conjunto por cada nodo.
+     ○   Una estructura para la solución.
+●   Algoritmo:
+     ○   Mientras haya aristas o más de un conjunto:
+          ■ Se elige la menor arista:
+                ● Si sus nodos están en conjuntos distintos:
+                      ○ Se añade la arista a la solución.
+                      ○ Se fusionan los conjuntos.
+                ● En caso contrario se descarta la arista.
+     ○   Por solución es la colección de aristas
+Árbol de expansión mínimo - Prim
+●   Se necesita:
+     ○   Una tabla con una ﬁla por nodo. Por cada nodo:
+          ■ Distancia para llegar a él (inicialmente inﬁnito).            Nodo        Dist.   Previo
+          ■ Nodo previo (inicialmente nulo).                                A          ∞        -
+●   Algoritmo:
+                                                                            B          ∞        -
+     ○   Se marca el nodo inicial como coste cero y su nodo previo nulo.
+     ○   Repetir N veces:                                                   …          ∞        -
+          ■ Por cada arista del grafo:
+                ● La arista conecta u con v.
+                ● Si distancia[v] > peso(u, v).
+                      ○ Se actualiza su distancia y se marca u como su nodo previo.
+     ○   Por solución es la colección de aristas
+Cierre transitivo
+●   Se puede usar el recorrido en profundidad para resolverlo aplicando el
+    recorrido desde cada uno de los nodos.
+
+
+
+●   En matrices de adyacencia su complejidad es de O(n3).
+
+
+
+●   Para listas de adyacencia su complejidad es de O(n(n+m)) que se aproxima a
+    O(n3) para grafos densos.
+Cierre transitivo
+●   Floyd-Warshall es un alternativa muy simple para obtener el cierre transitivo de
+    un grafo.
+
+
+
+●   Busca iterativamente si un par de nodos están conectados por un nodo
+    intermedio.
+
+
+
+●   La complejidad del algoritmo Floyd-Warshall también es O(n3).
+Cierre transitivo - Floyd-Warshall
+●   Se necesita:
+     ○   El grafo.
+●   Algoritmo:
+     ○   Por cada nodo k del grafo:
+          ■ Por cada nodo u del grafo:
+                ● Por cada nodo v del grafo:
+                     ○ Si u y v son distintos…
+                     ○ Si existe (u, k)...
+                     ○ Si existe (k, v)...
+                     ○ Si no existe (u, v)...
+                     ○ Añadir (u, v)
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+

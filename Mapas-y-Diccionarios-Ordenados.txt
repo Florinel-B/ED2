@@ -1,0 +1,1335 @@
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+Objetivos
+●   Descripción de las estructuras de datos mapa y diccionario ordenado
+
+
+
+●   Aproximaciones basadas en árboles binarios de búsqueda (ABB)
+
+
+
+●   Diseño e implementación de los TAD ABB y diccionario.
+Índice
+●   Árboles binarios de búsqueda
+
+
+
+●   Mapas y Diccionarios ordenados
+
+
+
+●   Equilibrado de árboles
+     ○   Árboles AVL
+     ○   Árboles Rojo-Negro
+Índice
+●   Árboles binarios de búsqueda
+
+
+
+●   Mapas y Diccionarios ordenados
+
+
+
+●   Equilibrado de árboles
+     ○   Árboles AVL
+     ○   Árboles Rojo-Negro
+Árbol binario de búsqueda
+●   Un ABB es un árbol binario en el que todos
+    sus nodos satisfacen:                                              4
+     ○   Sean u, v y w tres nodos tales que u está en el
+         sub-árbol izquierdo de v y w en el sub-árbol
+         derecho. Entonces:                                    2           5
+
+          value(u) < value(v) < value(w)
+                                                           1       3           6
+●   Por lo tanto, un recorrido en inorden visita
+    los elementos en orden ascendente.
+Árbol binario de búsqueda
+●   La búsqueda de un elemento v desde el
+    nodo n de un ABB se puede expresar de                         4
+    manera recursiva.
+     ○   La complejidad del algoritmo es O(h) donde
+         h es la altura.                                  2           5
+
+     TreeSearch(value, node)
+       if isLeaf(node)
+                                                      1       3           6
+          return value == node.value
+       if value < node.value
+          return TreeSearch(value, node.left)
+       else if value > node.value
+          return TreeSearch(value, node.right)
+       return true;
+Árbol binario de búsqueda
+●     El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+      un algoritmo recursivo o iterativo                Insert(value)
+                                                      Node auxParent = null
+         ○   La complejidad del algoritmo es O(h),    Node aux = root
+             donde h es la altura                     while aux != null
+                                                       auxParent = aux
+                                                       if value < aux.value
+Insertar 5               3                                aux = aux.left
+                                                       else
+                                                          aux = aux.right
+
+               1                    8                 Node newNode(value)
+                                                      if auxParent == null
+                                                         root = newNode
+                                                      else if value < auxParent.value
+                                                         auxParent.left = newNode
+     0                        6           9           else
+                                                         auxParent.right = newNode
+                                                      newNode.parent = auxParent.
+                                    7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent                             7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                        Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),    Node aux = root
+               donde h es la altura                     while aux != null
+                                                         auxParent = aux
+                                                         if value < aux.value
+  Insertar 5               3                                aux = aux.left
+                                                         else
+                                                            aux = aux.right
+
+                 1                    8                 Node newNode(value)
+                                                        if auxParent == null
+                                                           root = newNode
+                                                        else if value < auxParent.value
+                                                           auxParent.left = newNode
+       0                        6           9           else
+                                                           auxParent.right = newNode
+                                                        newNode.parent = auxParent.
+auxParent            aux              7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                           Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),       Node aux = root
+               donde h es la altura                        while aux != null
+                                                            auxParent = aux
+                                                            if value < aux.value
+  Insertar 5               3                    newNode        aux = aux.left
+                                                            else
+                                                               aux = aux.right
+                                                       5
+                 1                    8                    Node newNode(value)
+                                                           if auxParent == null
+                                                              root = newNode
+                                                           else if value < auxParent.value
+                                                              auxParent.left = newNode
+       0                        6           9              else
+                                                              auxParent.right = newNode
+                                                           newNode.parent = auxParent.
+auxParent                             7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                           Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),       Node aux = root
+               donde h es la altura                        while aux != null
+                                                            auxParent = aux
+                                                            if value < aux.value
+  Insertar 5               3                    newNode        aux = aux.left
+                                                            else
+                                                               aux = aux.right
+                                                       5
+                 1                    8                    Node newNode(value)
+                                                           if auxParent == null
+                                                              root = newNode
+                                                           else if value < auxParent.value
+                                                              auxParent.left = newNode
+       0                        6           9              else
+                                                              auxParent.right = newNode
+                                                           newNode.parent = auxParent.
+auxParent                             7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                           Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),       Node aux = root
+               donde h es la altura                        while aux != null
+                                                            auxParent = aux
+                                                            if value < aux.value
+  Insertar 5               3                    newNode        aux = aux.left
+                                                            else
+                                                               aux = aux.right
+                                                       5
+                 1                    8                    Node newNode(value)
+                                                           if auxParent == null
+                                                              root = newNode
+                                                           else if value < auxParent.value
+                                                              auxParent.left = newNode
+       0                        6           9              else
+                                                              auxParent.right = newNode
+                                                           newNode.parent = auxParent.
+auxParent                             7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                          Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),      Node aux = root
+               donde h es la altura                       while aux != null
+                                                           auxParent = aux
+                                                           if value < aux.value
+  Insertar 5                3                   newNode       aux = aux.left
+                                                           else
+                                                              aux = aux.right
+
+                 1                    8                   Node newNode(value)
+                                                          if auxParent == null
+                                                             root = newNode
+                                                          else if value < auxParent.value
+                                                             auxParent.left = newNode
+       0                        6           9             else
+                                                             auxParent.right = newNode
+                                                          newNode.parent = auxParent.
+auxParent               5             7
+  Árbol binario de búsqueda
+   ●    El algoritmo para insertar la clave value en un ABB se puede expresar mediante
+        un algoritmo recursivo o iterativo                Insert(value)
+                                                          Node auxParent = null
+           ○   La complejidad del algoritmo es O(h),      Node aux = root
+               donde h es la altura                       while aux != null
+                                                           auxParent = aux
+                                                           if value < aux.value
+  Insertar 5                3                   newNode       aux = aux.left
+                                                           else
+                                                              aux = aux.right
+
+                 1                    8                   Node newNode(value)
+                                                          if auxParent == null
+                                                             root = newNode
+                                                          else if value < auxParent.value
+                                                             auxParent.left = newNode
+       0                        6           9             else
+                                                             auxParent.right = newNode
+                                                          newNode.parent = auxParent.
+auxParent               5             7
+Árbol binario de búsqueda
+●      El mínimo de un subárbol de un ABB corresponde a su nodo más a la izquierda.
+
+                                                                       3
+
+●      Obsérvese que, gracias a la estructura del árbol
+                                                              1                8
+       binario de búsqueda, no es necesario comparar
+       valores
+                                                          0                6       9
+Minimum(node)
+while node.left
+  node = node.left                                                 5           7
+return node
+Árbol binario de búsqueda
+●      Si un nodo tiene hijo derecho, el sucesor es el mínimo del subárbol derecho.
+
+                                                                         3
+
+●      Si no tiene hijo derecho, su sucesor será el primer
+                                                                 1               8
+       ancestro mayor que él.
+
+Successor(node)
+if node.right
+   return Minimum(node.right)
+                                                             0               6        9
+Node aux = node.parent
+while aux and node == aux.right
+   node = aux                                                        5           7
+   aux = aux.parent
+return aux
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                         3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos                   1               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                        0               6       9
+
+
+                                                                5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                         3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos                   1               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                        0               6       9
+
+
+                                                                5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                         3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos                   1               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                        0               6
+
+
+                                                                5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                         3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos                   1               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                        0               6
+
+
+                                                                5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                         3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos                   1               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                        0               6
+
+
+                                                                5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                     3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos               0               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                                    6
+
+
+                                                            5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                     3
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos               0               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                                    6
+
+
+                                                            5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                     5
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos               0               8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                                    6
+
+
+                                                            5           7
+Árbol binario de búsqueda
+●   El borrado tiene 3 casos:
+     ○   El nodo a borrar es una hoja
+          ■ Se elimina el nodo directamente                 5
+     ○   El nodo a borrar solo tiene un hijo
+          ■ Se reemplaza el nodo por su hijo
+     ○   El nodo a borrar tiene dos hijos               0           8
+          ■ Se pone al nodo el valor de su sucesor
+          ■ Se borra el sucesor del subárbol derecho.
+                                                                6
+
+
+                                                                    7
+Índice
+●   Árboles binarios de búsqueda
+
+
+
+●   Mapas y Diccionarios ordenados
+
+
+
+●   Equilibrado de árboles
+     ○   Árboles AVL
+     ○   Árboles Rojo-Negro
+Mapas y Diccionarios ordenados
+●   Almacenan pares clave-valor permitiendo la búsqueda eﬁciente por clave.
+
+
+
+●   En un mapa no se permiten repeticiones en un diccionario si.
+
+
+
+●   Los elementos tiene un orden, se debe proporcionar el criterio de ordenación.
+
+
+
+●   En c++ se implementan como set, map, multiset y multimap (no confundir con
+    las versiones “unordered_”).
+Mapas y Diccionarios ordenados
+●   La búsqueda de un elemento es O(logN).
+
+
+
+●   Pero permiten la búsqueda por rango.
+
+
+
+●   El criterio de elección entre las versiones ordenadas (map, …) y desordenadas
+    (unordered_map, …):
+     ○   Si solo se necesita acceso a un elemento y se hace habitualmente: unordered_map
+     ○   Si necesito recorrer en un orden, preguntar por un rango, acceder al siguiente, etc.: map
+Índice
+●   Árboles binarios de búsqueda
+
+
+
+●   Mapas y Diccionarios ordenados
+
+
+
+●   Equilibrado de árboles
+     ○   Árboles AVL
+     ○   Árboles Rojo-Negro
+Equilibrado de ABB
+●   Si bien la complejidad de las operaciones de un árbol binario no cambian, la
+    velocidad depende enormemente del equilibrio del árbol.
+
+
+
+●   Hay muchos criterios de equilibrio suelen estar relacionados con la altura.
+Equilibrado de ABB
+●   Los árboles equilibrados o balanceados surgen para mejorar el rendimiento de
+    operaciones que involucren una búsqueda pues mantienen la altura logarítmica
+
+
+
+●   Se estudiarán dos tipos de árboles equilibrados:
+     ○   Árboles AVL (Adelson-Velskii y Landis)
+
+
+
+
+     ○   Árboles Rojo Negro
+Árboles AVL
+●   Georgy Adelson-Velsky y Evgenii Landis tuvieron la idea de equilibrar un árbol
+    de manera que el subárbol izquierdo y el sub-árbol derecho de cualquier nodo
+    tuviesen, aproximadamente, la misma altura.
+Árboles AVL
+●   Un árbol AVL es un árbol binario de búsqueda con una condición de equilibrio.
+     ○   Para cada nodo, la altura de los 2 subárboles
+                                                                       -1✓
+         no diﬁere en más de una unidad.
+
+     ○   El Factor de equilibrio o balance de un nodo se         -1✓             0
+         deﬁne como la diferencia de altura de sus dos                           ✓
+         subárboles (derecho - izquierdo).
+
+     ○   Cada nodo de un AVL puede tener un balance        -1✓
+         de -1, 0 ó 1.
+
+     ○   Para que el cálculo del factor sea eﬁciente, en               0     0   0
+         cada nodo hay que mantener su altura.                         ✓     ✓   ✓
+                                                           0
+                                                           ✓
+Árboles AVL
+●   Un árbol AVL es un árbol binario de búsqueda con una condición de equilibrio.
+     ○   Para cada nodo, la altura de los 2 subárboles
+                                                                     -2❌
+         no diﬁere en más de una unidad.
+
+     ○   El Factor de equilibrio o balance de un nodo se        1✓              0
+         deﬁne como la diferencia de altura de sus dos                          ✓
+         subárboles (derecho - izquierdo).
+
+     ○   Cada nodo de un AVL puede tener un balance        0✓          -1✓
+         de -1, 0 ó 1.
+
+     ○   Para que el cálculo del factor sea eﬁciente, en
+         cada nodo hay que mantener su altura.
+                                                                 0
+                                                                 ✓
+Árboles AVL
+●   La altura de un ABB-AVL con n nodos es O(logN).
+     ○   Si n(h) es el número mínimo de nodos de un
+         ABB-AVL con altura h:
+           ■ n(1) = 1
+           ■ n(2) = 2
+           ■ n(h) = n(h-1) + n(h-2) + 1
+
+     ○   Al ser mínimo, la altura de los subárboles de un
+         nodo X de altura h siempre se diferencian en 1.
+         Por eso se suma n(h-1) + n(h-2) añadiendo 1 por
+         por el nodo X.
+     ○   Esta fórmula corresponde con la serie de Fibonacci
+         cuyo crecimiento es exponencial.
+Árbol AVL
+●   Inserción:
+     ○   Se inserta en ABB normal
+
+
+
+
+     ○   Se comprueba la condición de equilibrio
+
+
+
+
+     ○   Si no está en equilibrio se restaura aplicando rotaciones:
+           ■ Rotación simple: izq-izq ó dcha-dcha
+           ■ Rotación doble: izq-dcha ó dcha-izq
+Árboles AVL
+●   Rotación Simple
+Árboles AVL
+●   Rotación Doble (1)
+Árboles AVL
+●   Rotación Doble (2)
+Árboles Rojo-Negro
+●   Sería deseable que los árboles tuviesen la misma profundidad partiendo de
+    cualquier hoja.
+
+
+
+●   Ya que esto no siempre es posible, se plantea crear un árbol donde eso se
+    cumpla excepto por unos pocos nodos que pintaremos de rojo.
+
+
+
+●   Por simplicidad de los algoritmos supondremos que los punteros a Nulo son
+    hojas negras.
+Árboles Rojo-Negro
+●   ARN: árbol binario de búsqueda con nodos coloreados de rojo o negro
+
+
+
+●   La forma de colorear los nodos asegura que ningún camino (raíz-hoja) es más del
+    doble de largo que otro
+
+
+
+●   Los borrados en ARN realizan menos operaciones de restructuración que los
+    AVL
+Árboles Rojo-Negro
+●   Cada nodo contiene:
+     ○   color                       62
+     ○   valor
+     ○   hijo izquierdo
+     ○   hijo derecho          44         78
+     ○   padre
+
+                          17        50         88
+Árboles Rojo-Negro
+●   Propiedades de los ARN
+     ○   Su raíz es negra                                          62
+     ○   Todas sus hojas (nodos nulos) son negros
+     ○   Los hijos de un nodo rojo son negros
+     ○   Todas las hojas tienen la misma profundidad negra   44         78
+          ■ Profundidad negra: antepasados negros
+
+                                                        17        50         88
+     Árboles Rojo-Negro
+    Su raíz es negra                                             26
+    Todas sus hojas son negras
+    Los hijos de un nodo rojo son negros
+    Todas las hojas tienen la misma
+    profundidad negra
+                                                 17                                  41
+
+
+                             14                             21             30              47
+
+
+              10                                16    19         23   28        38
+
+
+      7               12                   15              20              35         39
+
+
+3
+Árboles Rojo-Negro
+●   Altura negra de un nodo x, bh(x): número de nodos negros de los caminos entre
+    el nodo x y las hojas, sin incluir a x.
+
+●   Altura negra de un árbol rojo-negro: altura negra de su nodo raíz.
+
+●   Un árbol rojo-negro que almacena n elementos tiene una altura h que veriﬁca
+    log2(n+1) ≤ h ≤ 2log2(n+1)
+
+●   La búsqueda de una elemento en un árbol rojo negro es O(log2n)
+Árboles Rojo-Negro
+●   Inserción en un ARN
+     ○   Se inserta como en un ABB                        13
+     ○   El nodo insertado se colorea de rojo
+     ○   Si es la raíz se deja negro
+                                                    10              16
+
+
+
+     ○   Ejemplo: insertar el valor 3           7        12    15
+Árboles Rojo-Negro
+●   Inserción en un ARN
+     ○   Se inserta como en un ABB                            13
+     ○   El nodo insertado se colorea de rojo
+     ○   Si es la raíz se deja negro
+                                                        10              16
+
+
+
+     ○   Ejemplo: insertar el valor 3               7        12    15
+
+           Si su padre es negro, se stisfacen
+           todas las propiedades                3
+Árboles Rojo-Negro
+●   Inserción en un ARN
+     ○   Se inserta como en un ABB                            13
+     ○   El nodo insertado se colorea de rojo
+     ○   Si es la raíz se deja negro
+                                                        10              16
+
+
+
+     ○   Ejemplo: insertar el valor 14              7        12    15
+
+
+                                                3
+Árboles Rojo-Negro
+●   Inserción en un ARN
+     ○   Se inserta como en un ABB                            13
+     ○   El nodo insertado se colorea de rojo
+     ○   Si es la raíz se deja negro
+                                                        10               16
+
+
+
+     ○   Ejemplo: insertar el valor 14              7        12     15
+
+
+                                                3                  14
+Árboles Rojo-Negro
+●   Inserción en un ARN
+     ○   Se inserta como en un ABB                            13
+     ○   El nodo insertado se colorea de rojo
+     ○   Si es la raíz se deja negro
+                                                        10               16
+
+
+
+     ○   Ejemplo: insertar el valor 14              7        12     15
+
+           La propiedad 3 no se cumple, se
+           produce un doble rojo                3                  14
+Árboles Rojo-Negro
+●   Para remediar el doble rojo se pueden cumplir 2 casos:
+     ○   Caso 1: el tío del nodo insertado es negro          13
+     ○   Caso 2: el tío del nodo insertado es rojo
+
+                                                      …                     16   u
+
+●   Notación:
+     ○   z: nodo insertado                                        y    15            w
+     ○   v: padre de z
+     ○   w: tío de z
+     ○   u: abuelo de z
+                                                             z    14
+Árboles Rojo-Negro
+●   Caso 1: el tío del nodo insertado es negro
+     ○   Se lleva uno de los nodos del doble rojo a la posición
+         del abuelo. Repartiendo los rojos se elimina el
+         problema del doble rojo
+                                                                                16   u
+
+
+●   Para ello:                                                        y    15            w
+     ○   Aplicar reestructuración trinodo
+          ■ Dado el nodo insertado z, su padre v y su abuelo u
+               se reestructura
+                                                                  z   14
+     ○   Colorear el nodo medio como negro y sus hijos de rojo
+Árboles Rojo-Negro
+●       Solo cuatro posibles conﬁguraciones del caso 1
+
+            6   u              2   u                           6   u           2       u
+
+    y   4           w   w          4       y           y   2           w   w       y       6
+
+
+z   2                              z   6                       z   4           z   4
+
+
+
+
+                                                   4
+
+
+                                               2           6
+Árboles Rojo-Negro
+●   Caso 2: el tío del nodo insertado es rojo
+     ○    Un recoloreado a negro en ambas rama y un recoloreado a rojo en un ascendiente para no
+          cambiar la altura negra.
+
+
+
+
+                   4   u
+
+      w    2               7   v
+
+                   6   z
+Árboles Rojo-Negro
+●   Caso 2: el tío del nodo insertado es rojo
+     ○    Un recoloreado a negro en ambas rama y un recoloreado a rojo en un ascendiente para no
+          cambiar la altura negra.
+●   Para ello:
+     ○    Aplicar un recoloreado
+     ○    El padre v y el tío w se colorean a negro
+     ○    El abuelo u se colorea de rojo ( salvo si es raíz).
+
+
+                    4    u                                      4   u
+
+      w    2                 7   v                  w    2              7   v
+
+                     6   z                                      6   z
+Árboles Rojo-Negro
+●   Caso 2: el tío del nodo insertado es rojo
+     ○    Tras el recoloreado, puede aparecer el problema del doble rojo en el abuelo “u”. Si aparece,
+          aplicar el caso que corresponda (caso 1 o caso 2).
+     ○    El recoloreado, elimina el problema del doble rojo o lo propaga
+
+
+
+                                                    1
+
+
+                   4    u                                    4    u
+
+      w    2                7   v               w    2                7   v
+
+                    6   z                                     6   z
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                      13
+     ○   Aplicable solo si el elemento a borrar tiene
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su            10              16
+         sucesor y se borra
+
+                                                            7        12    15
+
+     ○   Ejemplo: borrar el valor 13
+                                                        3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                      13
+     ○   Aplicable solo si el elemento a borrar tiene
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su            10              16
+         sucesor y se borra
+
+                                                            7        12    15
+
+     ○   Ejemplo: borrar el valor 13
+                                                        3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                      15
+     ○   Aplicable solo si el elemento a borrar tiene
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su            10              16
+         sucesor y se borra
+
+                                                            7        12    13
+
+     ○   Ejemplo: borrar el valor 13
+                                                        3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                      15
+     ○   Aplicable solo si el elemento a borrar tiene
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su            10         16
+         sucesor y se borra
+
+                                                            7        12
+
+     ○   Ejemplo: borrar el valor 13
+                                                        3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                      15
+     ○   Aplicable solo si el elemento a borrar tiene
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su            10         16
+         sucesor y se borra
+
+                                                            7        12
+
+     ○   Ejemplo: borrar el valor 12
+                                                        3
+Árboles Rojo-Negro
+                                                                                  u
+●   Borrado en un ARN
+     ○   Se borra como en un ABB                                          15
+     ○   Aplicable solo si el elemento a borrar tiene
+                                                                x
+         un hijo nulo
+     ○   Si no tiene hijo nulo se intercambia por su                10                16
+         sucesor y se borra
+                                                                              v
+                                                            7            12
+
+     ○   Ejemplo: borrar el valor 12                                 w            r
+                                                        3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                             u
+     ○   Hacer que r sea hijo de x.                                        10
+     ○   Si v o r eran rojos, r se colorea de negro.
+                                                               x
+                                                                   7            12
+
+                                                           v
+                                                               3
+
+                                                       w           r
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                         u
+     ○   Hacer que r sea hijo de x.                                    10
+     ○   Si v o r eran rojos, r se colorea de negro.
+                                                           x
+                                                               7            12
+
+                                                       r
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                             x
+     ○   Hacer que r sea hijo de x.                                        10
+     ○   Si v o r eran rojos, r se colorea de negro.
+                                                               v
+                                                                   7            12
+
+
+                                                       r           w
+                                                           3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                     x
+     ○   Hacer que r sea hijo de x.                                10
+     ○   Si v o r eran rojos, r se colorea de negro.
+
+
+                                                       r   3            12
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                     x
+     ○   Hacer que r sea hijo de x.                                10
+     ○   Si v o r eran rojos, r se colorea de negro.
+     ○   Si v y r eran ambos negros, para preservar
+         la profundidad negra, hay que asignar a       r   3            12
+         “r” un doble negro.
+Árboles Rojo-Negro
+                                                                                 u
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                               15
+     ○   Hacer que r sea hijo de x.
+                                                               x
+     ○   Si v o r eran rojos, r se colorea de negro.
+     ○   Si v y r eran ambos negros, para preservar                10                16
+         la profundidad negra, hay que asignar a
+                                                                             v
+         “r” un doble negro.
+                                                           7            12
+
+                                                                    w            r
+     ○   Ejemplo: borrar el valor 12                   3
+Árboles Rojo-Negro
+                                                                                 u
+●   Borrado en un ARN
+     ○   Eliminar nodo v y su hijo nulo w.                                  15
+     ○   Hacer que r sea hijo de x.
+                                                               x
+     ○   Si v o r eran rojos, r se colorea de negro.
+     ○   Si v y r eran ambos negros, para preservar                10                16
+         la profundidad negra, hay que asignar a
+         “r” un doble negro.                                            r
+                                                           7
+
+
+     ○   Ejemplo: borrar el valor 12                   3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 1: el hermano de r (y) es negro y uno de sus
+               sobrinos(z) es rojo -> reestructuración
+           ■ Caso 2: el hermano de r (y) es negro y sus sobrinos               x
+               negros(z) - recoloración
+                                                                                   10
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste
+
+                                                                       y                r
+                                                                           7
+
+                                                                   z               z
+                                                                       3
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 1: el hermano de r (y) es negro y uno de sus           y
+               sobrinos(z) es rojo -> reestructuración                       7
+                                                                                          x
+                                                                 z
+                                                                     3               10
+     ○   Para ello:
+          ■ Reestructuración                                                                  r
+                                                                                 z
+          ■ Colorear menor y mayor de negro
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 1: el hermano de r (y) es negro y uno de sus           y
+               sobrinos(z) es rojo -> reestructuración                       7
+                                                                                          x
+                                                                 z
+                                                                     3               10
+     ○   Para ello:
+          ■ Reestructuración                                                                  r
+                                                                                 z
+          ■ Colorear menor y mayor de negro
+          ■ El nodo medio queda con el color anterior de X
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 1: el hermano de r (y) es negro y uno de sus           y
+               sobrinos(z) es rojo -> reestructuración                       7
+                                                                                          x
+                                                                 z
+                                                                     3               10
+     ○   Para ello:
+          ■ Reestructuración                                                                  r
+                                                                                 z
+          ■ Colorear menor y mayor de negro
+          ■ El nodo medio queda con el color anterior de X
+          ■ Colorear r de negro
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 2: el hermano de r (y) es negro y sus sobrinos
+               negros(z) - recoloración                                7
+                                                                                x
+                                                                           10
+     ○   Para ello:
+          ■ Recoloreado de r como negro e y como rojo              y                     r
+          ■ Si x es rojo, se pasa a negro                              8            13
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 2: el hermano de r (y) es negro y sus sobrinos
+               negros(z) - recoloración                                7
+                                                                                x
+                                                                           10
+     ○   Para ello:
+          ■ Recoloreado de r como negro e y como rojo              y                     r
+          ■ Si x es rojo, se pasa a negro                              8            13
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 2: el hermano de r (y) es negro y sus sobrinos
+               negros(z) - recoloración                                7
+                                                                                x
+                                                                           10
+     ○   Para ello:
+          ■ Recoloreado de r como negro e y como rojo              y                     r
+          ■ Si x es rojo, se pasa a negro                              8            13
+
+           Si x no era rojo, x vuelve a ser
+           doble negro. Ver caso (1, 2 o 3)
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste                    x
+                                                                        10
+                  z se elige en función de la
+                  posición de y (rotación simple).
+                                                                y                     r
+                                                                    8            13
+
+                                                            z
+                                                                7
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste                    x
+                                                                        10
+                  z se elige en función de la
+                  posición de y (rotación simple).
+                                                                y                     r
+     ○   Para ello:                                                 8            13
+          ■ Reestructuración
+                                                            z
+                                                                7
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste       y
+                                                                    8
+                  z se elige en función de la
+                  posición de y (rotación simple).          z                x
+                                                                7       10
+     ○   Para ello:
+          ■ Reestructuración                                                          r
+                                                                                 13
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste       y
+                                                                    8
+                  z se elige en función de la
+                  posición de y (rotación simple).          z                x
+                                                                7       10
+     ○   Para ello:
+          ■ Reestructuración                                                          r
+          ■ Colorear y de negro y x de rojo                                      13
+Árboles Rojo-Negro
+●   Borrado en un ARN
+     ○   3 posibles situaciones:
+           ■ Caso 3: el hermano de r(y) es rojo -> ajuste       y
+                                                                    8
+                  z se elige en función de la
+                  posición de y (rotación simple).          z                x
+                                                                7       10
+     ○   Para ello:
+          ■ Reestructuración                                                          r
+          ■ Colorear y de negro y x de rojo                                      13
+
+                  El doble negro no desaparece.
+                  Caso 1 o 2.
+                      Asignatura obligatoria
+
+                      Segundo cuatrimestre
+Estructura de         Créditos: 6
+
+   Datos II           Moodle de la asignatura
+
+                      Guía docente
+ David Concha Gómez
+

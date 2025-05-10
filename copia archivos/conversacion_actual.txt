@@ -1,0 +1,4089 @@
+Florinel-B: te voy a mandar unos indices y necesito explicaciones en c++ de la posible implementacion  y como trabajas con ellos y breve explicacion de cada cosa que saldra Puedes usar las herramientas a las que tienes acceso (como Google Drive, búsqueda web, etc.) si te ayudarán a realizar mejor esta tarea. No uses la herramienta de análisis. Por favor, mantén tus respuestas amigables, breves y conversacionales.
+
+Por favor, ejecuta la tarea tan pronto como puedas 
+
+GitHub Copilot: Estaré encantado de explicar implementaciones y uso de índices en C++. Para empezar, ¿podrías compartir cuáles son los tipos específicos de índices sobre los que necesitas información? Algunos ejemplos comunes son:
+
+- Índices de arreglos/vectores
+- Índices en estructuras de datos como árboles (B-Tree, B+Tree)
+- Índices hash
+- Índices invertidos
+- Índices bitmap
+
+Una vez que me indiques qué índices te interesan, podré proporcionarte explicaciones detalladas con ejemplos de código en C++.
+
+Florinel-B: este es el indice que yo tengo ndice
+● Introducción a los árboles
+● Operaciones generales
+● Árbol N-ario
+○ LinkedTree
+○ LCRSTree (Left Child Right Sibling Tree)
+● Recorridos
+○ Iteradores personalizados
+● Árbol Binario
+○ Linked Binary Tree
+○ Array Binary Tree
+○ Montículo
+ tienes que explicarme todo lo que puedas sobre estos temas
+
+GitHub Copilot: # Estructuras de Datos: Árboles en C++
+
+## Introducción a los árboles
+
+Los árboles son estructuras de datos no lineales con una organización jerárquica. A diferencia de arreglos o listas enlazadas, los árboles tienen una relación padre-hijo entre sus elementos.
+
+**Conceptos básicos:**
+
+- **Nodo**: Elemento fundamental que contiene datos y referencias a otros nodos
+- **Raíz**: Primer nodo del árbol, no tiene padre
+- **Hoja**: Nodo sin hijos
+- **Nivel**: Distancia desde la raíz
+- **Altura**: Longitud del camino más largo desde la raíz hasta una hoja
+- **Subárbol**: Árbol formado por un nodo y sus descendientes
+
+**Implementación básica de un nodo de árbol:**
+
+```cpp
+template<typename T>
+struct TreeNode {
+    T data;
+    vector<TreeNode<T>*> children;
+    
+    TreeNode(const T& value) : data(value) {}
+};
+```
+
+## Operaciones generales
+
+Las operaciones comunes en árboles incluyen:
+
+1. **Inserción**: Agregar un nuevo nodo
+2. **Eliminación**: Quitar un nodo existente
+3. **Búsqueda**: Encontrar un nodo con un valor específico
+4. **Recorrido**: Visitar todos los nodos en cierto orden
+5. **Determinar altura/profundidad**
+6. **Contar nodos**
+
+## Árbol N-ario
+
+Un árbol N-ario es aquel donde cada nodo puede tener cualquier número de hijos.
+
+### LinkedTree
+
+En esta implementación, cada nodo mantiene una colección (generalmente un vector o lista) de referencias a sus hijos.
+
+```cpp
+template<typename T>
+class LinkedTree {
+private:
+    struct Node {
+        T data;
+        vector<Node*> children;
+        
+        Node(const T& value) : data(value) {}
+    };
+    
+    Node* root;
+    int size;
+    
+public:
+    LinkedTree() : root(nullptr), size(0) {}
+    
+    void insert(const T& parentValue, const T& value) {
+        if (!root) {
+            root = new Node(value);
+            size++;
+            return;
+        }
+        
+        // Buscar el nodo padre y agregar el hijo
+        Node* parent = findNode(root, parentValue);
+        if (parent) {
+            parent->children.push_back(new Node(value));
+            size++;
+        }
+    }
+    
+    Node* findNode(Node* current, const T& value) {
+        if (!current) return nullptr;
+        
+        if (current->data == value) return current;
+        
+        for (Node* child : current->children) {
+            Node* found = findNode(child, value);
+            if (found) return found;
+        }
+        
+        return nullptr;
+    }
+    
+    // Más operaciones...
+};
+```
+
+### LCRSTree (Left Child Right Sibling Tree)
+
+Es una forma eficiente de implementar árboles N-arios usando sólo dos punteros por nodo:
+- Un puntero al primer hijo (leftChild)
+- Un puntero al siguiente hermano (rightSibling)
+
+```cpp
+template<typename T>
+class LCRSTree {
+private:
+    struct Node {
+        T data;
+        Node* leftChild;
+        Node* rightSibling;
+        
+        Node(const T& value) : data(value), leftChild(nullptr), rightSibling(nullptr) {}
+    };
+    
+    Node* root;
+    int size;
+    
+public:
+    LCRSTree() : root(nullptr), size(0) {}
+    
+    void insert(const T& parentValue, const T& value) {
+        if (!root) {
+            root = new Node(value);
+            size++;
+            return;
+        }
+        
+        Node* parent = findNode(root, parentValue);
+        if (parent) {
+            if (!parent->leftChild) {
+                // Primer hijo
+                parent->leftChild = new Node(value);
+            } else {
+                // Buscar el último hermano
+                Node* sibling = parent->leftChild;
+                while (sibling->rightSibling) {
+                    sibling = sibling->rightSibling;
+                }
+                sibling->rightSibling = new Node(value);
+            }
+            size++;
+        }
+    }
+    
+    // Más operaciones...
+};
+```
+
+## Recorridos
+
+Los recorridos permiten visitar todos los nodos del árbol en un orden específico:
+
+1. **Preorden**: Raíz, subárbol izquierdo, subárbol derecho
+2. **Inorden**: Subárbol izquierdo, raíz, subárbol derecho (común en árboles binarios)
+3. **Postorden**: Subárbol izquierdo, subárbol derecho, raíz
+4. **Por niveles**: Visita nodos nivel por nivel, de izquierda a derecha
+
+### Iteradores personalizados
+
+Los iteradores personalizados permiten recorrer la estructura del árbol sin exponer su implementación interna.
+
+```cpp
+template<typename T>
+class TreeIterator {
+private:
+    vector<TreeNode<T>*> nodes; // Nodos en el orden de recorrido
+    size_t current;
+    
+public:
+    TreeIterator(TreeNode<T>* root, TraversalType type) : current(0) {
+        if (type == PREORDER) {
+            preorderTraversal(root);
+        } else if (type == POSTORDER) {
+            postorderTraversal(root);
+        } else if (type == LEVELORDER) {
+            levelOrderTraversal(root);
+        }
+    }
+    
+    bool hasNext() const {
+        return current < nodes.size();
+    }
+    
+    T& next() {
+        return nodes[current++]->data;
+    }
+    
+    // Métodos de implementación de recorridos...
+private:
+    void preorderTraversal(TreeNode<T>* node) {
+        if (!node) return;
+        nodes.push_back(node);
+        for (auto child : node->children) {
+            preorderTraversal(child);
+        }
+    }
+    
+    // Otros métodos de recorrido...
+};
+```
+
+## Árbol Binario
+
+Un árbol binario es un tipo de árbol donde cada nodo tiene como máximo dos hijos: izquierdo y derecho.
+
+### Linked Binary Tree
+
+Implementación mediante nodos enlazados:
+
+```cpp
+template<typename T>
+class LinkedBinaryTree {
+private:
+    struct Node {
+        T data;
+        Node* left;
+        Node* right;
+        
+        Node(const T& value) : data(value), left(nullptr), right(nullptr) {}
+    };
+    
+    Node* root;
+    int size;
+    
+public:
+    LinkedBinaryTree() : root(nullptr), size(0) {}
+    
+    void insert(const T& value) {
+        // Para un BST (Binary Search Tree)
+        root = insertRecursive(root, value);
+        size++;
+    }
+    
+private:
+    Node* insertRecursive(Node* node, const T& value) {
+        if (!node) {
+            return new Node(value);
+        }
+        
+        if (value < node->data) {
+            node->left = insertRecursive(node->left, value);
+        } else if (value > node->data) {
+            node->right = insertRecursive(node->right, value);
+        }
+        
+        return node;
+    }
+    
+    // Más operaciones...
+};
+```
+
+### Array Binary Tree
+
+Representación de un árbol binario usando un arreglo:
+
+```cpp
+template<typename T>
+class ArrayBinaryTree {
+private:
+    vector<T> tree;
+    int nextPos;
+    
+public:
+    ArrayBinaryTree(int capacity) : nextPos(0) {
+        tree.resize(capacity);
+    }
+    
+    void insert(const T& value) {
+        if (nextPos >= tree.size()) {
+            tree.resize(tree.size() * 2);
+        }
+        
+        tree[nextPos++] = value;
+    }
+    
+    T getLeftChild(int index) {
+        int leftIndex = 2 * index + 1;
+        if (leftIndex < nextPos) {
+            return tree[leftIndex];
+        }
+        throw out_of_range("No left child");
+    }
+    
+    T getRightChild(int index) {
+        int rightIndex = 2 * index + 2;
+        if (rightIndex < nextPos) {
+            return tree[rightIndex];
+        }
+        throw out_of_range("No right child");
+    }
+    
+    T getParent(int index) {
+        if (index <= 0 || index >= nextPos) {
+            throw out_of_range("Invalid index");
+        }
+        return tree[(index - 1) / 2];
+    }
+    
+    // Más operaciones...
+};
+```
+
+### Montículo (Heap)
+
+Un montículo es un árbol binario que satisface la propiedad de montículo:
+- Max-Heap: El valor de cada nodo es mayor o igual al de sus hijos
+- Min-Heap: El valor de cada nodo es menor o igual al de sus hijos
+
+```cpp
+template<typename T>
+class MinHeap {
+private:
+    vector<T> heap;
+    
+    int parent(int i) { return (i - 1) / 2; }
+    int leftChild(int i) { return 2 * i + 1; }
+    int rightChild(int i) { return 2 * i + 2; }
+    
+    void heapifyUp(int index) {
+        int p = parent(index);
+        if (index > 0 && heap[index] < heap[p]) {
+            swap(heap[index], heap[p]);
+            heapifyUp(p);
+        }
+    }
+    
+    void heapifyDown(int index) {
+        int smallest = index;
+        int left = leftChild(index);
+        int right = rightChild(index);
+        
+        if (left < heap.size() && heap[left] < heap[smallest]) {
+            smallest = left;
+        }
+        
+        if (right < heap.size() && heap[right] < heap[smallest]) {
+            smallest = right;
+        }
+        
+        if (smallest != index) {
+            swap(heap[index], heap[smallest]);
+            heapifyDown(smallest);
+        }
+    }
+    
+public:
+    void insert(const T& value) {
+        heap.push_back(value);
+        heapifyUp(heap.size() - 1);
+    }
+    
+    T extractMin() {
+        if (heap.empty()) {
+            throw out_of_range("Heap is empty");
+        }
+        
+        T min = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        
+        if (!heap.empty()) {
+            heapifyDown(0);
+        }
+        
+        return min;
+    }
+    
+    T peek() {
+        if (heap.empty()) {
+            throw out_of_range("Heap is empty");
+        }
+        return heap[0];
+    }
+    
+    bool isEmpty() {
+        return heap.empty();
+    }
+    
+    int size() {
+        return heap.size();
+    }
+};
+```
+
+Cada una de estas estructuras tiene aplicaciones específicas según los requisitos de tiempo de ejecución y espacio que necesites. Los árboles son fundamentales en muchos algoritmos y aplicaciones como bases de datos, sistemas de archivos y análisis sintáctico.
+
+Similar code found with 2 license types
+
+Florinel-B: el recorido con interador necesito que se implemente en una clase que no contenga el arbol directamente
+
+GitHub Copilot: # Iteradores personalizados para recorrido de árboles
+
+Para implementar un iterador que sea independiente de la clase del árbol, podemos crear una clase iteradora separada que funcione con cualquier implementación de árbol. Esto sigue el patrón de diseño Iterator, permitiendo recorrer la estructura sin exponer su implementación interna.
+
+## Implementación de iteradores externos
+
+Primero, definimos una interfaz genérica para nodos de árbol y luego implementamos iteradores para diferentes tipos de recorrido:
+
+```cpp
+// Interfaz genérica que cualquier nodo de árbol puede implementar
+template<typename T>
+class TreeNodeInterface {
+public:
+    virtual T& getData() = 0;
+    virtual vector<TreeNodeInterface<T>*> getChildren() = 0;
+    virtual bool hasChildren() = 0;
+    virtual ~TreeNodeInterface() {}
+};
+
+// Enumeración para los tipos de recorrido
+enum TraversalType {
+    PREORDER,
+    POSTORDER,
+    LEVELORDER
+};
+
+// Iterador genérico para árboles
+template<typename T>
+class TreeIterator {
+private:
+    vector<TreeNodeInterface<T>*> nodeStack;
+    TraversalType traversalType;
+    
+public:
+    TreeIterator(TreeNodeInterface<T>* root, TraversalType type) : traversalType(type) {
+        if (!root) return;
+        
+        switch (type) {
+            case PREORDER:
+                initPreorder(root);
+                break;
+            case POSTORDER:
+                initPostorder(root);
+                break;
+            case LEVELORDER:
+                initLevelOrder(root);
+                break;
+        }
+    }
+    
+    bool hasNext() const {
+        return !nodeStack.empty();
+    }
+    
+    T& next() {
+        if (!hasNext()) {
+            throw runtime_error("No more elements");
+        }
+        
+        TreeNodeInterface<T>* node = nodeStack.back();
+        nodeStack.pop_back();
+        
+        // En preorden, agregamos los hijos después de visitar el nodo
+        if (traversalType == PREORDER) {
+            auto children = node->getChildren();
+            // Agregamos en orden inverso para que el primero en salir sea el izquierdo
+            for (int i = children.size() - 1; i >= 0; i--) {
+                nodeStack.push_back(children[i]);
+            }
+        }
+        
+        return node->getData();
+    }
+    
+private:
+    void initPreorder(TreeNodeInterface<T>* root) {
+        // En preorden, primero visitamos la raíz
+        nodeStack.push_back(root);
+    }
+    
+    void initPostorder(TreeNodeInterface<T>* root) {
+        // Para postorden, necesitamos usar una pila auxiliar
+        stack<pair<TreeNodeInterface<T>*, bool>> auxStack;
+        auxStack.push({root, false});
+        
+        while (!auxStack.empty()) {
+            auto [node, visited] = auxStack.top();
+            auxStack.pop();
+            
+            if (visited) {
+                nodeStack.push_back(node);
+            } else {
+                // Marcamos el nodo como visitado y lo volvemos a meter
+                auxStack.push({node, true});
+                
+                // Agregamos los hijos en orden inverso
+                auto children = node->getChildren();
+                for (int i = children.size() - 1; i >= 0; i--) {
+                    auxStack.push({children[i], false});
+                }
+            }
+        }
+        
+        // Invertimos para que el orden de extracción sea correcto
+        reverse(nodeStack.begin(), nodeStack.end());
+    }
+    
+    void initLevelOrder(TreeNodeInterface<T>* root) {
+        // Para recorrido por niveles, usamos una cola
+        queue<TreeNodeInterface<T>*> bfsQueue;
+        bfsQueue.push(root);
+        
+        while (!bfsQueue.empty()) {
+            TreeNodeInterface<T>* node = bfsQueue.front();
+            bfsQueue.pop();
+            
+            nodeStack.push_back(node);
+            
+            for (auto child : node->getChildren()) {
+                bfsQueue.push(child);
+            }
+        }
+        
+        // Invertimos para que el orden de extracción sea correcto
+        reverse(nodeStack.begin(), nodeStack.end());
+    }
+};
+```
+
+## Adaptar estructuras de árbol existentes
+
+Para usar este iterador con una implementación específica de árbol, necesitamos adaptar los nodos para que implementen la interfaz `TreeNodeInterface`. Aquí hay un ejemplo de cómo hacerlo con un árbol N-ario:
+
+```cpp
+// Implementación de un nodo de árbol N-ario que se adapta a la interfaz
+template<typename T>
+class LinkedTreeNode : public TreeNodeInterface<T> {
+private:
+    T data;
+    vector<LinkedTreeNode<T>*> children;
+    
+public:
+    LinkedTreeNode(const T& value) : data(value) {}
+    
+    void addChild(LinkedTreeNode<T>* child) {
+        if (child) {
+            children.push_back(child);
+        }
+    }
+    
+    // Implementación de la interfaz TreeNodeInterface
+    T& getData() override {
+        return data;
+    }
+    
+    vector<TreeNodeInterface<T>*> getChildren() override {
+        vector<TreeNodeInterface<T>*> result;
+        for (auto child : children) {
+            result.push_back(static_cast<TreeNodeInterface<T>*>(child));
+        }
+        return result;
+    }
+    
+    bool hasChildren() override {
+        return !children.empty();
+    }
+};
+```
+
+## Ejemplo de uso
+
+Ahora podemos utilizar nuestro iterador con cualquier implementación de árbol que se adapte a la interfaz:
+
+```cpp
+// Ejemplo de cómo usarlo
+void exampleUsage() {
+    // Crear un árbol de ejemplo
+    LinkedTreeNode<int>* root = new LinkedTreeNode<int>(1);
+    LinkedTreeNode<int>* child1 = new LinkedTreeNode<int>(2);
+    LinkedTreeNode<int>* child2 = new LinkedTreeNode<int>(3);
+    LinkedTreeNode<int>* child3 = new LinkedTreeNode<int>(4);
+    LinkedTreeNode<int>* child1_1 = new LinkedTreeNode<int>(5);
+    LinkedTreeNode<int>* child1_2 = new LinkedTreeNode<int>(6);
+    LinkedTreeNode<int>* child2_1 = new LinkedTreeNode<int>(7);
+    
+    root->addChild(child1);
+    root->addChild(child2);
+    root->addChild(child3);
+    child1->addChild(child1_1);
+    child1->addChild(child1_2);
+    child2->addChild(child2_1);
+    
+    // Crear un iterador en preorden
+    cout << "Preorden: ";
+    TreeIterator<int> preorderIt(root, PREORDER);
+    while (preorderIt.hasNext()) {
+        cout << preorderIt.next() << " ";
+    }
+    cout << endl;
+    
+    // Crear un iterador en postorden
+    cout << "Postorden: ";
+    TreeIterator<int> postorderIt(root, POSTORDER);
+    while (postorderIt.hasNext()) {
+        cout << postorderIt.next() << " ";
+    }
+    cout << endl;
+    
+    // Crear un iterador por niveles
+    cout << "Por niveles: ";
+    TreeIterator<int> levelOrderIt(root, LEVELORDER);
+    while (levelOrderIt.hasNext()) {
+        cout << levelOrderIt.next() << " ";
+    }
+    cout << endl;
+    
+    // Liberar memoria (en una implementación real usaríamos smart pointers)
+    // ...
+}
+```
+
+Esta implementación tiene varias ventajas:
+
+1. **Separación de intereses**: El iterador está completamente separado de la implementación del árbol
+2. **Reutilización**: Podemos usar el mismo iterador con diferentes tipos de árboles
+3. **Ocultamiento de la implementación**: Los usuarios del iterador no necesitan conocer los detalles internos del árbol
+4. **Flexibilidad**: Se pueden agregar nuevos tipos de recorrido sin modificar las clases de árbol
+
+La clase `TreeIterator` puede adaptarse fácilmente a cualquier estructura de árbol, siempre que implementemos correctamente la interfaz `TreeNodeInterface` para nuestros nodos.
+
+Florinel-B: te puedo dar de contexto este codigo para que lo tengas en cuenta 
+
+GitHub Copilot: Gracias por compartir este código. Veo que ya tienes una implementación de un árbol binario (`LinkedBinaryTree`) y un iterador personalizado (`WithoutSiblingIterator`).
+
+Tu implementación utiliza un patrón interesante donde el iterador es independiente de la clase del árbol, justo como mencionabas. El `WithoutSiblingIterator` no contiene directamente el árbol, sino que recibe una referencia a él y trabaja con esta referencia.
+
+Observaciones clave de tu implementación:
+
+1. **Separación de estructura de datos e iterador**: El iterador recibe el árbol como parámetro en lugar de ser una clase interna.
+
+2. **Iteradores STL-compatibles**: Tu iterador implementa los operadores necesarios (`++`, `*`, `!=`) para ser usado en bucles for basados en rangos.
+
+3. **Patrón Iterable**: La clase `Iterable<T, I>` implementa el patrón que expone los métodos `begin()` y `end()`.
+
+4. **Personalización del recorrido**: Tu `WithoutSiblingIterator` implementa una estrategia específica de recorrido que omite nodos con hermanos.
+
+Voy a crear diferentes tipos de iteradores para tu `LinkedBinaryTree` siguiendo este mismo patrón para los recorridos clásicos:
+
+```cpp
+#ifndef TREE_ITERATORS_H
+#define TREE_ITERATORS_H
+
+#include <queue>
+#include <stack>
+#include <list>
+
+// Iterador para recorrido en preorden (raíz, izquierda, derecha)
+template <typename T>
+class PreOrderIterator {
+public:
+    using Type = typename T::type;
+    using Node = typename T::Node<Type>;
+
+    PreOrderIterator() : t{} {}
+
+    PreOrderIterator(T& tree) : t(tree) {
+        auto root = t.getRoot();
+        if (root) {
+            s.push(root);
+        }
+    }
+
+    PreOrderIterator& operator++() {
+        if (!s.empty()) {
+            Node* current = s.top();
+            s.pop();
+
+            // Primero derecha (para que salga después al ser una pila)
+            auto right = t.getRightChild(current);
+            if (right) s.push(right);
+
+            // Luego izquierda (para que salga primero)
+            auto left = t.getLeftChild(current);
+            if (left) s.push(left);
+        }
+        return *this;
+    }
+
+    auto operator++(int) {
+        auto tmp(*this);
+        operator++();
+        return tmp;
+    }
+
+    Type operator*() const {
+        return t.getElement(s.top());
+    }
+
+    bool operator!=(const PreOrderIterator& other) const {
+        return !(s.empty() && other.s.empty());
+    }
+
+private:
+    T t;
+    std::stack<Node*> s;
+};
+
+// Iterador para recorrido en inorden (izquierda, raíz, derecha)
+template <typename T>
+class InOrderIterator {
+public:
+    using Type = typename T::type;
+    using Node = typename T::Node<Type>;
+
+    InOrderIterator() : t{} {}
+
+    InOrderIterator(T& tree) : t(tree) {
+        auto root = t.getRoot();
+        if (root) {
+            pushAllLeftChildren(root);
+        }
+    }
+
+    InOrderIterator& operator++() {
+        if (!s.empty()) {
+            Node* current = s.top();
+            s.pop();
+
+            // Procesar hijo derecho
+            auto right = t.getRightChild(current);
+            if (right) {
+                pushAllLeftChildren(right);
+            }
+        }
+        return *this;
+    }
+
+    auto operator++(int) {
+        auto tmp(*this);
+        operator++();
+        return tmp;
+    }
+
+    Type operator*() const {
+        return t.getElement(s.top());
+    }
+
+    bool operator!=(const InOrderIterator& other) const {
+        return !(s.empty() && other.s.empty());
+    }
+
+private:
+    T t;
+    std::stack<Node*> s;
+
+    void pushAllLeftChildren(Node* node) {
+        while (node != nullptr) {
+            s.push(node);
+            node = t.getLeftChild(node);
+        }
+    }
+};
+
+// Iterador para recorrido en postorden (izquierda, derecha, raíz)
+template <typename T>
+class PostOrderIterator {
+public:
+    using Type = typename T::type;
+    using Node = typename T::Node<Type>;
+
+    PostOrderIterator() : t{} {}
+
+    PostOrderIterator(T& tree) : t(tree) {
+        auto root = t.getRoot();
+        if (root) {
+            // Usamos una pila auxiliar para rastrear nodos visitados
+            std::stack<std::pair<Node*, bool>> tempStack;
+            tempStack.push({root, false});
+            
+            // Inicializar la pila principal
+            while (!tempStack.empty()) {
+                auto [node, visited] = tempStack.top();
+                tempStack.pop();
+                
+                if (visited) {
+                    // Nodo ya procesado, agregamos a la pila final
+                    s.push(node);
+                } else {
+                    // Marcar como visitado y volver a insertar
+                    tempStack.push({node, true});
+                    
+                    // Agregar hijos en orden (derecha primero para que salga después)
+                    auto right = t.getRightChild(node);
+                    if (right) tempStack.push({right, false});
+                    
+                    auto left = t.getLeftChild(node);
+                    if (left) tempStack.push({left, false});
+                }
+            }
+        }
+    }
+
+    PostOrderIterator& operator++() {
+        if (!s.empty()) {
+            s.pop();
+        }
+        return *this;
+    }
+
+    auto operator++(int) {
+        auto tmp(*this);
+        operator++();
+        return tmp;
+    }
+
+    Type operator*() const {
+        return t.getElement(s.top());
+    }
+
+    bool operator!=(const PostOrderIterator& other) const {
+        return !(s.empty() && other.s.empty());
+    }
+
+private:
+    T t;
+    std::stack<Node*> s; // Usamos pila para almacenar nodos en orden post-orden
+};
+
+// Iterador para recorrido por niveles (BFS)
+template <typename T>
+class LevelOrderIterator {
+public:
+    using Type = typename T::type;
+    using Node = typename T::Node<Type>;
+
+    LevelOrderIterator() : t{} {}
+
+    LevelOrderIterator(T& tree) : t(tree) {
+        auto root = t.getRoot();
+        if (root) {
+            q.push(root);
+        }
+    }
+
+    LevelOrderIterator& operator++() {
+        if (!q.empty()) {
+            Node* current = q.front();
+            q.pop();
+            
+            // Primero izquierda
+            auto left = t.getLeftChild(current);
+            if (left) q.push(left);
+            
+            // Luego derecha
+            auto right = t.getRightChild(current);
+            if (right) q.push(right);
+        }
+        return *this;
+    }
+
+    auto operator++(int) {
+        auto tmp(*this);
+        operator++();
+        return tmp;
+    }
+
+    Type operator*() const {
+        return t.getElement(q.front());
+    }
+
+    bool operator!=(const LevelOrderIterator& other) const {
+        return !(q.empty() && other.q.empty());
+    }
+
+private:
+    T t;
+    std::queue<Node*> q; // Usamos una cola para BFS
+};
+
+#endif // TREE_ITERATORS_H
+```
+
+Para usar estos iteradores, podrías modificar tu función `main` así:
+
+```cpp
+#include "tree_iterators.h"
+// ...resto del código existente...
+
+int main()
+{
+    // ...código existente...
+
+    std::cout << "Recorrido Pre-orden: ";
+    printBinaryTree<LinkedBinaryTree<int>, PreOrderIterator<LinkedBinaryTree<int>>>(t);
+
+    std::cout << "Recorrido In-orden: ";
+    printBinaryTree<LinkedBinaryTree<int>, InOrderIterator<LinkedBinaryTree<int>>>(t);
+
+    std::cout << "Recorrido Post-orden: ";
+    printBinaryTree<LinkedBinaryTree<int>, PostOrderIterator<LinkedBinaryTree<int>>>(t);
+
+    std::cout << "Recorrido por niveles: ";
+    printBinaryTree<LinkedBinaryTree<int>, LevelOrderIterator<LinkedBinaryTree<int>>>(t);
+
+    // ...resto del código existente...
+    return 0;
+}
+```
+
+Esta implementación sigue el mismo patrón que tu código original, donde los iteradores son completamente independientes de la estructura del árbol, pero trabajan con ella a través de su API pública.
+
+Florinel-B: ¡Hola Claude! ¿Podrías explicar un tema complejo de forma sencilla? Si necesitas más información de mi parte, hazme 1-2 preguntas clave directamente. Si crees que debería subir algún documento que te ayude a hacer un mejor trabajo, házmelo saber. Puedes usar las herramientas a las que tienes acceso (como Google Drive, búsqueda web, etc.) si te ayudarán a realizar mejor esta tarea. No uses la herramienta de análisis. Por favor, mantén tus respuestas amigables, breves y conversacionales.
+
+Por favor, ejecuta la tarea tan pronto como puedas - un elemento visual sería genial si tiene sentido. Si usas un elemento visual, considera qué tipo (interactivo, visual, lista de verificación, etc.) podría ser más útil para esta tarea específica. ¡Gracias por tu ayuda!
+
+GitHub Copilot: Veo que dispones de varios archivos relacionados con estructuras de datos de árboles. Basándome en estos archivos, te explicaré sobre los diferentes tipos de iteradores para recorridos de árboles en C++.
+
+# Iteradores para recorridos de árboles en C++
+
+Los iteradores son objetos que nos permiten recorrer una estructura de datos sin exponer su implementación interna. Para árboles, son especialmente útiles porque nos permiten visitar cada nodo siguiendo diferentes estrategias.
+
+## Tipos de recorridos básicos
+
+1. **Preorden**: Raíz → Hijo izquierdo → Hijo derecho
+   - Útil cuando necesitas procesar un nodo antes que sus hijos
+
+2. **Inorden**: Hijo izquierdo → Raíz → Hijo derecho
+   - Perfecto para árboles binarios de búsqueda (devuelve elementos ordenados)
+
+3. **Postorden**: Hijo izquierdo → Hijo derecho → Raíz
+   - Ideal cuando necesitas procesar los hijos antes que sus padres
+
+4. **Por niveles**: Los nodos se visitan nivel por nivel, de izquierda a derecha
+   - Útil para visualizar la estructura jerárquica del árbol
+
+## Implementación de iteradores personalizados
+
+Para implementar un iterador externo a la clase del árbol:
+
+```cpp
+template <typename T>
+class TreeIterator {
+private:
+    std::vector<typename T::Node<typename T::type>*> nodes; // Nodos a visitar
+    size_t current;  // Posición actual
+    
+public:
+    // Constructor que inicializa el recorrido
+    TreeIterator(typename T::Node<typename T::type>* root, TraversalType type) 
+        : current(0) {
+        // Inicializar según el tipo de recorrido
+        if (type == PREORDER) {
+            initPreorder(root);
+        } else if (type == INORDER) {
+            initInorder(root);
+        } // etc.
+    }
+    
+    // Verificar si hay más elementos
+    bool hasNext() const {
+        return current < nodes.size();
+    }
+    
+    // Obtener el siguiente elemento
+    typename T::type operator*() {
+        return nodes[current]->data;
+    }
+    
+    // Avanzar al siguiente elemento
+    TreeIterator& operator++() {
+        if (hasNext()) current++;
+        return *this;
+    }
+
+private:
+    // Métodos de inicialización para diferentes recorridos
+    void initPreorder(typename T::Node<typename T::type>* node) {
+        if (!node) return;
+        nodes.push_back(node);
+        initPreorder(node->left);
+        initPreorder(node->right);
+    }
+    
+    // Implementaciones para otros recorridos...
+};
+```
+
+## Uso de iteradores en la STL
+
+Para que tus iteradores sean compatibles con la STL, deben implementar los siguientes operadores:
+
+- `operator*()`: Para acceder al valor actual
+- `operator++()`: Para avanzar al siguiente elemento
+- `operator!=()`: Para comparar iteradores
+
+Esto permite usarlos en bucles de rango (range-based for loops):
+
+```cpp
+for (auto& value : tree) {
+    cout << value << " ";
+}
+```
+
+## Beneficios de usar iteradores externos
+
+1. **Separación de intereses**: El recorrido está separado de la estructura del árbol
+2. **Flexibilidad**: Puedes implementar múltiples recorridos sin modificar la clase árbol
+3. **Compatibilidad con STL**: Permite usar algoritmos estándar con tus estructuras
+
+La clave es diseñar tus iteradores para que trabajen con la API pública del árbol, sin acceder directamente a su representación interna.
+
+¿Hay algún tipo específico de recorrido o implementación sobre la que quisieras más detalles?
+
+Florinel-B: pues viendo todos los archivos que tienes disponible me tienes que prepar un plan de estudio con pequeños problmeas para ir resolviendo 
+
+GitHub Copilot: Veo que tienes un conjunto completo de archivos para el estudio de estructuras de datos avanzadas. Basado en los archivos disponibles, te prepararé un plan de estudio progresivo con pequeños problemas para resolver en cada tema.
+
+# Plan de Estudio: Estructuras de Datos Avanzadas
+
+## Semana 1: Árboles Generales y N-arios
+**Material de estudio:** 
+- `Árboles generales.pdf`
+- NARY_TREE.cpp
+
+**Ejercicios:**
+1. **Nivel básico:** Implementa una función que cuente el número total de nodos en un árbol N-ario.
+2. **Nivel intermedio:** Crea una función que calcule la altura de un árbol N-ario.
+3. **Nivel avanzado:** Implementa un iterador por niveles (breadth-first) para un árbol N-ario que sea independiente de la clase del árbol.
+
+## Semana 2: Árboles Binarios de Búsqueda Balanceados
+**Material de estudio:**
+- avl.cpp (Árboles AVL)
+- rb.cpp (Árboles Rojo-Negro)
+
+**Ejercicios:**
+1. **Nivel básico:** Verifica si un árbol AVL está correctamente balanceado.
+2. **Nivel intermedio:** Implementa una función que convierta un árbol AVL a un árbol Rojo-Negro.
+3. **Nivel avanzado:** Compara el rendimiento de inserciones y búsquedas entre AVL y Rojo-Negro utilizando diferentes conjuntos de datos (ordenados, aleatorios, casi ordenados).
+
+## Semana 3: Mapas y Diccionarios
+**Material de estudio:**
+- `Mapas y Diccionarios.pdf`
+- Mapas-y-Diccionarios.txt
+- hashmap.cpp
+- vector_hash.cpp
+
+**Ejercicios:**
+1. **Nivel básico:** Implementa una función de hash para cadenas que minimice las colisiones.
+2. **Nivel intermedio:** Crea una clase que implemente un diccionario usando hash abierto (separate chaining).
+3. **Nivel avanzado:** Desarrolla un sistema de caché LRU (Least Recently Used) utilizando un hashmap y una estructura adicional para el seguimiento de acceso.
+
+## Semana 4: Mapas y Diccionarios Ordenados
+**Material de estudio:**
+- `Mapas y Diccionarios Ordenados.pdf`
+- Mapas-y-Diccionarios-Ordenados.txt
+
+**Ejercicios:**
+1. **Nivel básico:** Implementa un mapa ordenado utilizando un árbol AVL como estructura subyacente.
+2. **Nivel intermedio:** Diseña un algoritmo que encuentre el k-ésimo elemento más pequeño en un mapa ordenado.
+3. **Nivel avanzado:** Crea un diccionario ordenado con capacidad de búsqueda por prefijo (como un autocorrector).
+
+## Semana 5: Grafos
+**Material de estudio:**
+- Grafos.pdf
+- Grafos.txt
+- grafo1.cpp
+- grafo2.cpp
+
+**Ejercicios:**
+1. **Nivel básico:** Implementa los algoritmos BFS y DFS para recorrer un grafo.
+2. **Nivel intermedio:** Desarrolla un algoritmo para encontrar el camino más corto entre dos nodos (Dijkstra).
+3. **Nivel avanzado:** Implementa el algoritmo de Kruskal para encontrar el árbol de expansión mínima de un grafo.
+
+## Proyecto Final Integrador
+
+**Propuesta:** Sistema de navegación urbana
+- Implementa un sistema que represente una ciudad como un grafo ponderado.
+- Utiliza mapas ordenados para almacenar puntos de interés categorizados.
+- Implementa un árbol N-ario para representar la jerarquía de zonas de la ciudad.
+- Usa tablas hash para búsquedas rápidas de lugares por nombre.
+- Incorpora algoritmos de ruta más corta para calcular trayectos optimizados.
+
+## Recursos adicionales:
+
+Para cada tema, te recomiendo:
+1. Revisar primero los archivos `.txt` para un entendimiento teórico
+2. Estudiar los archivos `.pdf` para profundizar conceptos
+3. Analizar los archivos `.cpp` para ver implementaciones prácticas
+4. Resolver los problemas propuestos modificando o creando nuevos archivos basados en los ejemplos
+
+¿Te gustaría que profundizara en alguno de estos temas o en algún problema específico para comenzar?
+
+Florinel-B: no tengo mas de una semana para aprenderme este material necesito tanto todos los resumenes que puedas crear de mi temario tanto como guias  para aprender a escribir en c++ y usar una sintaxis adecuada y parecidaa los archivos que te proporcione. En este plan necesitare resumenes extensos que contega informacion relevante sobre cada tema y codigos de auto ayuda para hacer mi estudio necesito estudiar de manera proactiva ten en cuenta que no conozco c++ a nivel profesional y necesitare ayuda en la mayoria de casos. Finalmente me dejaras un pequeñp trabbajo que hacer al final de grafos o arboles que son lo mas destacado
+
+GitHub Copilot: # Plan de Estudio Intensivo: Estructuras de Datos Avanzadas en C++ (1 semana)
+
+## Día 1: Introducción a C++ y Árboles Generales
+
+### Resumen de C++ para Estructuras de Datos
+
+#### Conceptos básicos de C++
+- **Sintaxis básica**: Todas las sentencias terminan con punto y coma (`;`)
+- **Inclusión de bibliotecas**: `#include <nombre_biblioteca>`
+- **Espacio de nombres**: `using namespace std;` o `std::nombre_función`
+- **Tipos de datos**: `int`, `double`, `char`, `bool`, `string`
+- **Punteros**: Variables que almacenan direcciones de memoria: `Tipo* nombre`
+- **Referencias**: Alias para variables existentes: `Tipo& nombre`
+- **Operadores de punteros**: 
+  - `&variable`: Obtiene la dirección de memoria
+  - `*puntero`: Accede al valor apuntado (desreferenciación)
+  - `->`: Accede a miembros de estructuras/clases a través de puntero
+
+#### Clases y Templates en C++
+```cpp
+// Declaración de clase
+template<typename T>
+class MiClase {
+private:
+    // Variables miembro (atributos)
+    T valor;
+
+public:
+    // Constructor
+    MiClase(T inicial) : valor(inicial) {}
+
+    // Métodos
+    T getValor() const { return valor; }
+    void setValor(T nuevo) { valor = nuevo; }
+};
+```
+
+#### Manejo de memoria en C++
+```cpp
+// Asignación dinámica
+Node* nodo = new Node(valor);
+
+// Liberación de memoria (¡MUY IMPORTANTE!)
+delete nodo;
+
+// Para arrays
+int* array = new int[10];
+delete[] array;
+```
+
+### Resumen extenso: Árboles Generales
+
+Un árbol es una estructura de datos jerárquica no lineal que consiste en nodos conectados por aristas. Un árbol general (o N-ario) es aquel donde cada nodo puede tener cualquier número de hijos.
+
+#### Conceptos clave:
+1. **Nodo raíz**: Nodo superior del árbol sin padre
+2. **Nodo interno**: Nodo con al menos un hijo
+3. **Nodo hoja**: Nodo sin hijos
+4. **Nivel**: Distancia desde la raíz (raíz tiene nivel 0)
+5. **Altura**: Longitud del camino más largo desde la raíz hasta una hoja
+6. **Grado**: Número máximo de hijos por nodo
+7. **Subárbol**: Árbol formado por un nodo y sus descendientes
+
+#### Representaciones de Árboles Generales:
+
+1. **Lista de hijos**: Cada nodo mantiene una lista/vector de punteros a sus hijos
+```cpp
+template<typename T>
+class TreeNode {
+public:
+    T data;
+    vector<TreeNode<T>*> children;
+    
+    TreeNode(T value) : data(value) {}
+};
+```
+
+2. **Hijo izquierdo, hermano derecho (LCRS)**: Cada nodo tiene solo dos punteros
+```cpp
+template<typename T>
+class LCRSNode {
+public:
+    T data;
+    LCRSNode<T>* leftChild;  // Primer hijo
+    LCRSNode<T>* rightSibling;  // Siguiente hermano
+    
+    LCRSNode(T value) : data(value), leftChild(nullptr), rightSibling(nullptr) {}
+};
+```
+
+#### Operaciones básicas:
+1. **Inserción**: Agregar un nuevo nodo como hijo de otro
+2. **Eliminación**: Quitar un nodo y posiblemente su subárbol
+3. **Búsqueda**: Encontrar un nodo con un valor específico
+4. **Recorrido**: Visitar todos los nodos en un orden determinado
+
+#### Recorridos de Árboles:
+- **Preorden**: Raíz, luego subárboles de izquierda a derecha
+- **Postorden**: Subárboles de izquierda a derecha, luego raíz
+- **Por niveles (BFS)**: Visitar nodos nivel por nivel, de izquierda a derecha
+
+### Código de ayuda: Implementación básica de Árbol N-ario
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+template<typename T>
+class TreeNode {
+public:
+    T data;
+    vector<TreeNode<T>*> children;
+    
+    TreeNode(T value) : data(value) {}
+    
+    // Agregar un hijo
+    void addChild(T value) {
+        children.push_back(new TreeNode<T>(value));
+    }
+    
+    // Agregar un nodo existente como hijo
+    void addChild(TreeNode<T>* child) {
+        if (child) {
+            children.push_back(child);
+        }
+    }
+};
+
+template<typename T>
+class NaryTree {
+private:
+    TreeNode<T>* root;
+    
+    // Función auxiliar para eliminar el árbol
+    void deleteTree(TreeNode<T>* node) {
+        if (!node) return;
+        
+        for (auto child : node->children) {
+            deleteTree(child);
+        }
+        
+        delete node;
+    }
+    
+    // Función auxiliar para recorrido preorden
+    void preOrderTraversal(TreeNode<T>* node) {
+        if (!node) return;
+        
+        cout << node->data << " ";
+        
+        for (auto child : node->children) {
+            preOrderTraversal(child);
+        }
+    }
+
+public:
+    NaryTree() : root(nullptr) {}
+    
+    NaryTree(T rootValue) {
+        root = new TreeNode<T>(rootValue);
+    }
+    
+    ~NaryTree() {
+        deleteTree(root);
+    }
+    
+    TreeNode<T>* getRoot() {
+        return root;
+    }
+    
+    void setRoot(T rootValue) {
+        if (root) {
+            deleteTree(root);
+        }
+        root = new TreeNode<T>(rootValue);
+    }
+    
+    // Recorrido en preorden
+    void preOrder() {
+        preOrderTraversal(root);
+        cout << endl;
+    }
+    
+    // Recorrido por niveles (BFS)
+    void levelOrder() {
+        if (!root) return;
+        
+        queue<TreeNode<T>*> q;
+        q.push(root);
+        
+        while (!q.empty()) {
+            TreeNode<T>* current = q.front();
+            q.pop();
+            
+            cout << current->data << " ";
+            
+            for (auto child : current->children) {
+                q.push(child);
+            }
+        }
+        cout << endl;
+    }
+};
+```
+
+### Ejemplo de uso:
+```cpp
+int main() {
+    // Crear árbol N-ario
+    NaryTree<int> tree(1);  // Raíz con valor 1
+    
+    TreeNode<int>* root = tree.getRoot();
+    root->addChild(2);
+    root->addChild(3);
+    root->addChild(4);
+    
+    root->children[0]->addChild(5);
+    root->children[0]->addChild(6);
+    root->children[2]->addChild(7);
+    
+    cout << "Recorrido en preorden: ";
+    tree.preOrder();  // 1 2 5 6 3 4 7
+    
+    cout << "Recorrido por niveles: ";
+    tree.levelOrder();  // 1 2 3 4 5 6 7
+    
+    return 0;
+}
+```
+
+## Día 2: Árboles Binarios y Árboles Binarios de Búsqueda (BST)
+
+### Resumen extenso: Árboles Binarios
+
+Un árbol binario es un tipo de árbol donde cada nodo tiene como máximo dos hijos: izquierdo y derecho.
+
+#### Tipos de árboles binarios:
+1. **Árbol binario completo**: Todos los niveles están completamente llenos, excepto posiblemente el último nivel (que se llena de izquierda a derecha)
+2. **Árbol binario perfecto**: Todos los nodos internos tienen exactamente dos hijos y todas las hojas están al mismo nivel
+3. **Árbol binario degenerado**: Cada nodo interno tiene exactamente un hijo
+
+#### Representaciones de Árboles Binarios:
+
+1. **Representación enlazada**: Nodos con punteros a hijos
+```cpp
+template<typename T>
+struct BinaryNode {
+    T data;
+    BinaryNode<T>* left;
+    BinaryNode<T>* right;
+    
+    BinaryNode(T value) : data(value), left(nullptr), right(nullptr) {}
+};
+```
+
+2. **Representación con array**: Para árboles completos
+   - Para un nodo en la posición `i`:
+   - Hijo izquierdo: `2i + 1`
+   - Hijo derecho: `2i + 2`
+   - Padre: `(i-1)/2` (división entera)
+
+### Árboles Binarios de Búsqueda (BST)
+
+Un árbol binario de búsqueda es un tipo especial de árbol binario donde:
+- Todos los nodos en el subárbol izquierdo tienen valores menores que el nodo actual
+- Todos los nodos en el subárbol derecho tienen valores mayores que el nodo actual
+- Ambos subárboles también son BST
+
+#### Operaciones y complejidades:
+- **Búsqueda**: O(log n) en promedio, O(n) en peor caso
+- **Inserción**: O(log n) en promedio, O(n) en peor caso
+- **Eliminación**: O(log n) en promedio, O(n) en peor caso
+
+#### Problema de los BST:
+Los BST no balanceados pueden degenerar a una lista enlazada con operaciones O(n).
+
+### Código de ayuda: Implementación de BST
+```cpp
+#include <iostream>
+using namespace std;
+
+template<typename T>
+class BST {
+private:
+    struct Node {
+        T data;
+        Node* left;
+        Node* right;
+        
+        Node(T value) : data(value), left(nullptr), right(nullptr) {}
+    };
+    
+    Node* root;
+    
+    // Función auxiliar para inserción recursiva
+    Node* insertRecursive(Node* node, T value) {
+        if (!node) {
+            return new Node(value);
+        }
+        
+        if (value < node->data) {
+            node->left = insertRecursive(node->left, value);
+        } 
+        else if (value > node->data) {
+            node->right = insertRecursive(node->right, value);
+        }
+        
+        return node;
+    }
+    
+    // Función auxiliar para búsqueda recursiva
+    Node* searchRecursive(Node* node, T value) {
+        if (!node || node->data == value) {
+            return node;
+        }
+        
+        if (value < node->data) {
+            return searchRecursive(node->left, value);
+        }
+        
+        return searchRecursive(node->right, value);
+    }
+    
+    // Función auxiliar para encontrar el nodo con valor mínimo
+    Node* findMin(Node* node) {
+        if (!node) return nullptr;
+        
+        while (node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+    
+    // Función auxiliar para eliminación recursiva
+    Node* removeRecursive(Node* node, T value) {
+        if (!node) return nullptr;
+        
+        if (value < node->data) {
+            node->left = removeRecursive(node->left, value);
+        } 
+        else if (value > node->data) {
+            node->right = removeRecursive(node->right, value);
+        } 
+        else {
+            // Caso 1: Nodo hoja
+            if (!node->left && !node->right) {
+                delete node;
+                return nullptr;
+            }
+            // Caso 2: Nodo con un hijo
+            else if (!node->left) {
+                Node* temp = node->right;
+                delete node;
+                return temp;
+            }
+            else if (!node->right) {
+                Node* temp = node->left;
+                delete node;
+                return temp;
+            }
+            // Caso 3: Nodo con dos hijos
+            else {
+                Node* successor = findMin(node->right);
+                node->data = successor->data;
+                node->right = removeRecursive(node->right, successor->data);
+            }
+        }
+        return node;
+    }
+    
+    // Función auxiliar para recorrido inorden
+    void inOrderTraversal(Node* node) {
+        if (!node) return;
+        
+        inOrderTraversal(node->left);
+        cout << node->data << " ";
+        inOrderTraversal(node->right);
+    }
+    
+    // Función auxiliar para liberar memoria
+    void deleteTree(Node* node) {
+        if (!node) return;
+        
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+    
+public:
+    BST() : root(nullptr) {}
+    
+    ~BST() {
+        deleteTree(root);
+    }
+    
+    void insert(T value) {
+        root = insertRecursive(root, value);
+    }
+    
+    bool search(T value) {
+        return searchRecursive(root, value) != nullptr;
+    }
+    
+    void remove(T value) {
+        root = removeRecursive(root, value);
+    }
+    
+    void inOrder() {
+        inOrderTraversal(root);
+        cout << endl;
+    }
+};
+```
+
+### Ejemplo de uso:
+```cpp
+int main() {
+    BST<int> bst;
+    
+    // Insertar elementos
+    bst.insert(50);
+    bst.insert(30);
+    bst.insert(70);
+    bst.insert(20);
+    bst.insert(40);
+    bst.insert(60);
+    bst.insert(80);
+    
+    // Mostrar en orden (ordenados)
+    cout << "Árbol en orden: ";
+    bst.inOrder();  // 20 30 40 50 60 70 80
+    
+    // Buscar elementos
+    cout << "¿El valor 40 existe? " << (bst.search(40) ? "Sí" : "No") << endl;
+    cout << "¿El valor 45 existe? " << (bst.search(45) ? "Sí" : "No") << endl;
+    
+    // Eliminar un elemento
+    bst.remove(30);
+    
+    cout << "Árbol después de eliminar 30: ";
+    bst.inOrder();  // 20 40 50 60 70 80
+    
+    return 0;
+}
+```
+
+## Día 3: Árboles Balanceados (AVL y Rojo-Negro)
+
+### Resumen extenso: Árboles AVL
+
+Los árboles AVL son árboles binarios de búsqueda autobalanceados, donde la diferencia de altura entre los subárboles izquierdo y derecho de cualquier nodo (factor de equilibrio) no puede ser mayor que 1.
+
+#### Conceptos clave:
+1. **Factor de equilibrio**: altura(subárbol_derecho) - altura(subárbol_izquierdo)
+2. **Rotaciones**: Técnicas para reequilibrar el árbol
+   - Rotación simple a la izquierda
+   - Rotación simple a la derecha
+   - Rotación doble izquierda-derecha
+   - Rotación doble derecha-izquierda
+
+#### Operaciones y complejidades:
+- **Búsqueda**: O(log n)
+- **Inserción**: O(log n)
+- **Eliminación**: O(log n)
+
+#### Reglas de rebalanceo:
+- Factor de equilibrio = 2 y factor izquierdo >= 0: Rotación derecha simple
+- Factor de equilibrio = 2 y factor izquierdo < 0: Rotación doble izquierda-derecha
+- Factor de equilibrio = -2 y factor derecho <= 0: Rotación izquierda simple
+- Factor de equilibrio = -2 y factor derecho > 0: Rotación doble derecha-izquierda
+
+### Resumen extenso: Árboles Rojo-Negro
+
+Los árboles rojo-negro son otra implementación de árboles binarios de búsqueda autobalanceados con restricciones adicionales:
+
+#### Propiedades:
+1. Todo nodo es rojo o negro
+2. La raíz es negra
+3. Todas las hojas (NULL) son negras
+4. Si un nodo es rojo, ambos hijos son negros
+5. Todo camino desde un nodo a sus hojas descendientes contiene el mismo número de nodos negros
+
+#### Comparación con AVL:
+- **AVL**: Más balanceado (mejor para búsquedas)
+- **Rojo-Negro**: Menos operaciones de rebalanceo (mejor para inserciones/eliminaciones frecuentes)
+
+### Código de ayuda: Implementación de Árbol AVL
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+template<typename T>
+class AVLTree {
+private:
+    struct Node {
+        T data;
+        Node* left;
+        Node* right;
+        int height;
+        
+        Node(T value) : data(value), left(nullptr), right(nullptr), height(1) {}
+    };
+    
+    Node* root;
+    
+    // Función para obtener altura
+    int height(Node* node) {
+        if (!node) return 0;
+        return node->height;
+    }
+    
+    // Función para actualizar altura
+    void updateHeight(Node* node) {
+        if (!node) return;
+        node->height = 1 + max(height(node->left), height(node->right));
+    }
+    
+    // Obtener factor de equilibrio
+    int getBalance(Node* node) {
+        if (!node) return 0;
+        return height(node->right) - height(node->left);
+    }
+    
+    // Rotación simple a la derecha
+    Node* rotateRight(Node* y) {
+        Node* x = y->left;
+        Node* T2 = x->right;
+        
+        // Realizar rotación
+        x->right = y;
+        y->left = T2;
+        
+        // Actualizar alturas
+        updateHeight(y);
+        updateHeight(x);
+        
+        return x;
+    }
+    
+    // Rotación simple a la izquierda
+    Node* rotateLeft(Node* x) {
+        Node* y = x->right;
+        Node* T2 = y->left;
+        
+        // Realizar rotación
+        y->left = x;
+        x->right = T2;
+        
+        // Actualizar alturas
+        updateHeight(x);
+        updateHeight(y);
+        
+        return y;
+    }
+    
+    // Inserción recursiva
+    Node* insertRecursive(Node* node, T value) {
+        // 1. Inserción BST normal
+        if (!node) {
+            return new Node(value);
+        }
+        
+        if (value < node->data) {
+            node->left = insertRecursive(node->left, value);
+        } 
+        else if (value > node->data) {
+            node->right = insertRecursive(node->right, value);
+        }
+        else {  // Valor duplicado
+            return node;
+        }
+        
+        // 2. Actualizar altura
+        updateHeight(node);
+        
+        // 3. Obtener factor de equilibrio
+        int balance = getBalance(node);
+        
+        // 4. Casos de desequilibrio
+        
+        // Caso Izquierda-Izquierda
+        if (balance < -1 && value < node->left->data) {
+            return rotateRight(node);
+        }
+        
+        // Caso Derecha-Derecha
+        if (balance > 1 && value > node->right->data) {
+            return rotateLeft(node);
+        }
+        
+        // Caso Izquierda-Derecha
+        if (balance < -1 && value > node->left->data) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+        
+        // Caso Derecha-Izquierda
+        if (balance > 1 && value < node->right->data) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+        
+        return node;
+    }
+    
+    // Encontrar nodo con valor mínimo
+    Node* findMin(Node* node) {
+        if (!node) return nullptr;
+        while (node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+    
+    // Eliminación recursiva
+    Node* removeRecursive(Node* node, T value) {
+        if (!node) return nullptr;
+        
+        // 1. Eliminación BST normal
+        if (value < node->data) {
+            node->left = removeRecursive(node->left, value);
+        } 
+        else if (value > node->data) {
+            node->right = removeRecursive(node->right, value);
+        } 
+        else {
+            // Caso con uno o ningún hijo
+            if (!node->left || !node->right) {
+                Node* temp = node->left ? node->left : node->right;
+                
+                // Sin hijos
+                if (!temp) {
+                    temp = node;
+                    node = nullptr;
+                }
+                // Un hijo
+                else {
+                    *node = *temp;
+                }
+                
+                delete temp;
+            }
+            // Caso con dos hijos
+            else {
+                Node* successor = findMin(node->right);
+                node->data = successor->data;
+                node->right = removeRecursive(node->right, successor->data);
+            }
+        }
+        
+        // Si el árbol solo tenía un nodo
+        if (!node) return nullptr;
+        
+        // 2. Actualizar altura
+        updateHeight(node);
+        
+        // 3. Obtener factor de equilibrio
+        int balance = getBalance(node);
+        
+        // 4. Casos de desequilibrio
+        
+        // Caso Izquierda-Izquierda
+        if (balance < -1 && getBalance(node->left) <= 0) {
+            return rotateRight(node);
+        }
+        
+        // Caso Izquierda-Derecha
+        if (balance < -1 && getBalance(node->left) > 0) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+        
+        // Caso Derecha-Derecha
+        if (balance > 1 && getBalance(node->right) >= 0) {
+            return rotateLeft(node);
+        }
+        
+        // Caso Derecha-Izquierda
+        if (balance > 1 && getBalance(node->right) < 0) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+        
+        return node;
+    }
+    
+    // Recorrido inorden
+    void inOrderTraversal(Node* node) {
+        if (!node) return;
+        inOrderTraversal(node->left);
+        cout << node->data << "(" << getBalance(node) << ") ";
+        inOrderTraversal(node->right);
+    }
+    
+    // Liberar memoria
+    void deleteTree(Node* node) {
+        if (!node) return;
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+    
+public:
+    AVLTree() : root(nullptr) {}
+    
+    ~AVLTree() {
+        deleteTree(root);
+    }
+    
+    void insert(T value) {
+        root = insertRecursive(root, value);
+    }
+    
+    void remove(T value) {
+        root = removeRecursive(root, value);
+    }
+    
+    void inOrder() {
+        inOrderTraversal(root);
+        cout << endl;
+    }
+};
+```
+
+### Ejemplo de uso de AVL:
+```cpp
+int main() {
+    AVLTree<int> avl;
+    
+    // Inserción de valores que causarían desequilibrio en un BST normal
+    avl.insert(10);
+    avl.insert(20);
+    avl.insert(30);
+    avl.insert(40);
+    avl.insert(50);
+    avl.insert(25);
+    
+    cout << "AVL en orden (con factores de equilibrio): ";
+    avl.inOrder();
+    
+    // Eliminar un nodo
+    avl.remove(30);
+    
+    cout << "AVL después de eliminar 30: ";
+    avl.inOrder();
+    
+    return 0;
+}
+```
+
+## Día 4: Mapas y Diccionarios
+
+### Resumen extenso: Mapas y Diccionarios
+
+Los mapas y diccionarios son estructuras que almacenan asociaciones clave-valor, permitiendo búsquedas eficientes por clave.
+
+#### Conceptos clave:
+1. **Tabla hash**: Estructura que usa una función hash para mapear claves a posiciones
+2. **Función hash**: Transforma una clave en un índice de array
+3. **Colisiones**: Cuando dos claves diferentes generan el mismo índice
+4. **Factor de carga**: Relación entre elementos almacenados y tamaño de la tabla
+
+#### Técnicas de resolución de colisiones:
+1. **Encadenamiento (chaining)**: Cada celda contiene una lista de elementos
+2. **Direccionamiento abierto**: Busca otra posición cuando hay colisión:
+   - Sondeo lineal: Busca la siguiente posición disponible
+   - Sondeo cuadrático: Busca en incrementos cuadráticos
+   - Doble hash: Usa una segunda función hash para determinar el incremento
+
+#### Operaciones y complejidades (promedio):
+- **Inserción**: O(1)
+- **Búsqueda**: O(1)
+- **Eliminación**: O(1)
+
+### Código de ayuda: Implementación de HashMap con encadenamiento
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+#include <functional>
+#include <string>
+using namespace std;
+
+template<typename K, typename V>
+class HashMap {
+private:
+    // Estructura para los pares clave-valor
+    struct KeyValuePair {
+        K key;
+        V value;
+        
+        KeyValuePair(const K& k, const V& v) : key(k), value(v) {}
+    };
+    
+    vector<list<KeyValuePair>> table;
+    size_t itemCount;
+    size_t tableSize;
+    
+    // Función hash genérica
+    size_t hash(const K& key) const {
+        return hash<K>{}(key) % tableSize;
+    }
+    
+    // Redimensionar tabla cuando el factor de carga es alto
+    void rehash() {
+        size_t newSize = tableSize * 2;
+        vector<list<KeyValuePair>> newTable(newSize);
+        
+        for (const auto& bucket : table) {
+            for (const auto& pair : bucket) {
+                size_t index = hash<K>{}(pair.key) % newSize;
+                newTable[index].push_back(pair);
+            }
+        }
+        
+        table = move(newTable);
+        tableSize = newSize;
+    }
+    
+public:
+    HashMap(size_t initialSize = 16) : tableSize(initialSize), itemCount(0) {
+        table.resize(tableSize);
+    }
+    
+    // Insertar o actualizar un valor
+    void put(const K& key, const V& value) {
+        // Verificar factor de carga
+        if ((float)itemCount / tableSize > 0.75f) {
+            rehash();
+        }
+        
+        size_t index = hash(key);
+        
+        // Buscar si la clave ya existe
+        for (auto& pair : table[index]) {
+            if (pair.key == key) {
+                pair.value = value;  // Actualizar valor existente
+                return;
+            }
+        }
+        
+        // Insertar nueva clave-valor
+        table[index].push_back(KeyValuePair(key, value));
+        itemCount++;
+    }
+    
+    // Obtener valor por clave
+    V* get(const K& key) {
+        size_t index = hash(key);
+        
+        for (auto& pair : table[index]) {
+            if (pair.key == key) {
+                return &pair.value;
+            }
+        }
+        
+        return nullptr;  // No encontrado
+    }
+    
+    // Verificar si una clave existe
+    bool contains(const K& key) {
+        return get(key) != nullptr;
+    }
+    
+    // Eliminar una clave
+    bool remove(const K& key) {
+        size_t index = hash(key);
+        
+        auto& bucket = table[index];
+        for (auto it = bucket.begin(); it != bucket.end(); ++it) {
+            if (it->key == key) {
+                bucket.erase(it);
+                itemCount--;
+                return true;
+            }
+        }
+        
+        return false;  // No encontrado
+    }
+    
+    // Obtener número de elementos
+    size_t size() const {
+        return itemCount;
+    }
+    
+    // Verificar si está vacío
+    bool isEmpty() const {
+        return itemCount == 0;
+    }
+    
+    // Mostrar tabla hash (para depuración)
+    void display() {
+        for (size_t i = 0; i < tableSize; i++) {
+            cout << i << ": ";
+            for (const auto& pair : table[i]) {
+                cout << "(" << pair.key << ", " << pair.value << ") -> ";
+            }
+            cout << "nullptr" << endl;
+        }
+    }
+};
+```
+
+### Ejemplo de uso:
+```cpp
+int main() {
+    HashMap<string, int> edades;
+    
+    // Insertar elementos
+    edades.put("Ana", 25);
+    edades.put("Carlos", 30);
+    edades.put("María", 28);
+    edades.put("Juan", 22);
+    
+    // Obtener y mostrar valores
+    cout << "Edad de Ana: " << *edades.get("Ana") << endl;
+    cout << "Edad de Carlos: " << *edades.get("Carlos") << endl;
+    
+    // Verificar existencia
+    string nombre = "Pedro";
+    if (edades.contains(nombre)) {
+        cout << "Edad de " << nombre << ": " << *edades.get(nombre) << endl;
+    } else {
+        cout << nombre << " no está en el mapa" << endl;
+    }
+    
+    // Mostrar estructura interna
+    cout << "\nEstructura del HashMap:" << endl;
+    edades.display();
+    
+    // Actualizar valor
+    edades.put("Ana", 26);
+    cout << "\nDespués de actualizar la edad de Ana:" << endl;
+    cout << "Edad de Ana: " << *edades.get("Ana") << endl;
+    
+    // Eliminar valor
+    edades.remove("Carlos");
+    cout << "\nDespués de eliminar a Carlos:" << endl;
+    cout << "¿Carlos existe? " << (edades.contains("Carlos") ? "Sí" : "No") << endl;
+    
+    return 0;
+}
+```
+
+## Día 5: Mapas y Diccionarios Ordenados
+
+### Resumen extenso: Mapas y Diccionarios Ordenados
+
+Los mapas ordenados mantienen sus elementos ordenados por clave, facilitando operaciones como búsqueda por rango o iteración ordenada.
+
+#### Implementaciones comunes:
+1. **Basadas en árboles**:
+   - Árboles BST: Simple pero puede degenerar
+   - Árboles AVL: Garantizan O(log n) para operaciones
+   - Árboles Rojo-Negro: Equilibrio entre rendimiento y rebalanceo
+
+2. **Skip Lists**: Estructura probabilística similar a listas multinivel
+
+#### Operaciones y complejidades:
+- **Inserción**: O(log n)
+- **Búsqueda**: O(log n)
+- **Eliminación**: O(log n)
+- **Recorrido ordenado**: O(n)
+- **Búsqueda por rango**: O(log n + k) donde k es el número de elementos en el rango
+
+#### Ventajas sobre mapas no ordenados:
+1. Iteración en orden de claves
+2. Búsquedas por rango eficientes
+3. Obtención de clave más cercana
+4. Consistencia en rendimiento (sin casos peores O(n))
+
+### Código de ayuda: Implementación de Mapa Ordenado con Árbol AVL
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+template<typename K, typename V>
+class OrderedMap {
+private:
+    struct Node {
+        K key;
+        V value;
+        Node* left;
+        Node* right;
+        int height;
+        
+        Node(const K& k, const V& v) : key(k), value(v), left(nullptr), 
+                                      right(nullptr), height(1) {}
+    };
+    
+    Node* root;
+    size_t count;
+    
+    // Operaciones del árbol AVL (similares al ejemplo previo)
+    int height(Node* node) {
+        if (!node) return 0;
+        return node->height;
+    }
+    
+    void updateHeight(Node* node) {
+        if (!node) return;
+        node->height = 1 + max(height(node->left), height(node->right));
+    }
+    
+    int getBalance(Node* node) {
+        if (!node) return 0;
+        return height(node->right) - height(node->left);
+    }
+    
+    Node* rotateRight(Node* y) {
+        Node* x = y->left;
+        Node* T2 = x->right;
+        
+        x->right = y;
+        y->left = T2;
+        
+        updateHeight(y);
+        updateHeight(x);
+        
+        return x;
+    }
+    
+    Node* rotateLeft(Node* x) {
+        Node* y = x->right;
+        Node* T2 = y->left;
+        
+        y->left = x;
+        x->right = T2;
+        
+        updateHeight(x);
+        updateHeight(y);
+        
+        return y;
+    }
+    
+    // Inserción en mapa ordenado
+    Node* insertRecursive(Node* node, const K& key, const V& value, bool& created) {
+        if (!node) {
+            created = true;
+            return new Node(key, value);
+        }
+        
+        if (key < node->key) {
+            node->left = insertRecursive(node->left, key, value, created);
+        } 
+        else if (key > node->key) {
+            node->right = insertRecursive(node->right, key, value, created);
+        }
+        else {
+            // Clave ya existe, actualizar valor
+            node->value = value;
+            created = false;
+            return node;
+        }
+        
+        // Actualizar altura
+        updateHeight(node);
+        
+        // Rebalancear
+        int balance = getBalance(node);
+        
+        // Casos de desequilibrio
+        if (balance < -1 && key < node->left->key) {
+            return rotateRight(node);
+        }
+        
+        if (balance > 1 && key > node->right->key) {
+            return rotateLeft(node);
+        }
+        
+        if (balance < -1 && key > node->left->key) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+        
+        if (balance > 1 && key < node->right->key) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+        
+        return node;
+    }
+    
+    // Búsqueda
+    Node* findNode(Node* node, const K& key) {
+        if (!node) return nullptr;
+        
+        if (key < node->key) {
+            return findNode(node->left, key);
+        }
+        else if (key > node->key) {
+            return findNode(node->right, key);
+        }
+        else {
+            return node;
+        }
+    }
+    
+    // Encontrar el nodo con la clave mínima
+    Node* findMin(Node* node) {
+        if (!node) return nullptr;
+        while (node->left) {
+            node = node->left;
+        }
+        return node;
+    }
+    
+    // Eliminar nodo
+    Node* removeRecursive(Node* node, const K& key, bool& removed) {
+        if (!node) {
+            removed = false;
+            return nullptr;
+        }
+        
+        if (key < node->key) {
+            node->left = removeRecursive(node->left, key, removed);
+        }
+        else if (key > node->key) {
+            node->right = removeRecursive(node->right, key, removed);
+        }
+        else {
+            removed = true;
+            
+            // Nodo con uno o ningún hijo
+            if (!node->left || !node->right) {
+                Node* temp = node->left ? node->left : node->right;
+                
+                // Sin hijos
+                if (!temp) {
+                    temp = node;
+                    node = nullptr;
+                }
+                // Un hijo
+                else {
+                    *node = *temp;
+                }
+                
+                delete temp;
+            }
+            // Nodo con dos hijos
+            else {
+                Node* successor = findMin(node->right);
+                node->key = successor->key;
+                node->value = successor->value;
+                bool dummyRemoved;
+                node->right = removeRecursive(node->right, successor->key, dummyRemoved);
+            }
+        }
+        
+        if (!node) return nullptr;
+        
+        // Actualizar altura
+        updateHeight(node);
+        
+        // Rebalancear
+        int balance = getBalance(node);
+        
+        // Casos de desequilibrio
+        if (balance < -1 && getBalance(node->left) <= 0) {
+            return rotateRight(node);
+        }
+        
+        if (balance < -1 && getBalance(node->left) > 0) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+        
+        if (balance > 1 && getBalance(node->right) >= 0) {
+            return rotateLeft(node);
+        }
+        
+        if (balance > 1 && getBalance(node->right) < 0) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+        
+        return node;
+    }
+    
+    // Recorrer en orden para obtener pares ordenados
+    void inOrderTraversal(Node* node, vector<pair<K, V>>& result) {
+        if (!node) return;
+        inOrderTraversal(node->left, result);
+        result.push_back({node->key, node->value});
+        inOrderTraversal(node->right, result);
+    }
+    
+    // Recolectar claves en un rango
+    void keysInRange(Node* node, const K& lowKey, const K& highKey, vector<K>& result) {
+        if (!node) return;
+        
+        if (lowKey < node->key) {
+            keysInRange(node->left, lowKey, highKey, result);
+        }
+        
+        if (lowKey <= node->key && highKey >= node->key) {
+            result.push_back(node->key);
+        }
+        
+        if (highKey > node->key) {
+            keysInRange(node->right, lowKey, highKey, result);
+        }
+    }
+    
+    // Liberar memoria
+    void deleteTree(Node* node) {
+        if (!node) return;
+        deleteTree(node->left);
+        deleteTree(node->right);
+        delete node;
+    }
+    
+public:
+    OrderedMap() : root(nullptr), count(0) {}
+    
+    ~OrderedMap() {
+        deleteTree(root);
+    }
+    
+    // Insertar par clave-valor
+    void put(const K& key, const V& value) {
+        bool created = false;
+        root = insertRecursive(root, key, value, created);
+        if (created) {
+            count++;
+        }
+    }
+    
+    // Obtener valor por clave
+    V* get(const K& key) {
+        Node* node = findNode(root, key);
+        if (node) {
+            return &(node->value);
+        }
+        return nullptr;
+    }
+    
+    // Verificar existencia de clave
+    bool contains(const K& key) {
+        return findNode(root, key) != nullptr;
+    }
+    
+    // Eliminar por clave
+    bool remove(const K& key) {
+        bool removed = false;
+        root = removeRecursive(root, key, removed);
+        if (removed) {
+            count--;
+        }
+        return removed;
+    }
+    
+    // Obtener todas las claves
+    vector<K> keys() {
+        vector<pair<K, V>> entries;
+        inOrderTraversal(root, entries);
+        
+        vector<K> result;
+        for (const auto& entry : entries) {
+            result.push_back(entry.first);
+        }
+        
+        return result;
+    }
+    
+    // Obtener todos los valores
+    vector<V> values() {
+        vector<pair<K, V>> entries;
+        inOrderTraversal(root, entries);
+        
+        vector<V> result;
+        for (const auto& entry : entries) {
+            result.push_back(entry.second);
+        }
+        
+        return result;
+    }
+    
+    // Obtener claves en un rango
+    vector<K> keysInRange(const K& lowKey, const K& highKey) {
+        vector<K> result;
+        keysInRange(root, lowKey, highKey, result);
+        return result;
+    }
+    
+    // Obtener primer clave
+    K* firstKey() {
+        Node* min = findMin(root);
+        if (min) {
+            return &(min->key);
+        }
+        return nullptr;
+    }
+    
+    // Obtener número de elementos
+    size_t size() const {
+        return count;
+    }
+    
+    // Verificar si está vacío
+    bool isEmpty() const {
+        return count == 0;
+    }
+};
+```
+
+### Ejemplo de uso:
+```cpp
+int main() {
+    OrderedMap<int, string> estudiantes;
+    
+    // Insertar elementos
+    estudiantes.put(5, "Carlos");
+    estudiantes.put(3, "Ana");
+    estudiantes.put(8, "María");
+    estudiantes.put(1, "Juan");
+    estudiantes.put(10, "Elena");
+    
+    // Obtener y mostrar valores
+    cout << "Estudiante con ID 5: " << *estudiantes.get(5) << endl;
+    cout << "Estudiante con ID 1: " << *estudiantes.get(1) << endl;
+    
+    // Verificar existencia
+    int id = 7;
+    if (estudiantes.contains(id)) {
+        cout << "Estudiante con ID " << id << ": " << *estudiantes.get(id) << endl;
+    } else {
+        cout << "No hay estudiante con ID " << id << endl;
+    }
+    
+    // Mostrar estudiantes ordenados por ID
+    cout << "\nEstudiantes ordenados por ID:" << endl;
+    vector<int> ids = estudiantes.keys();
+    for (int id : ids) {
+        cout << "ID: " << id << ", Nombre: " << *estudiantes.get(id) << endl;
+    }
+    
+    // Buscar rango de IDs
+    cout << "\nEstudiantes con ID entre 3 y 8:" << endl;
+    vector<int> rangeIds = estudiantes.keysInRange(3, 8);
+    for (int id : rangeIds) {
+        cout << "ID: " << id << ", Nombre: " << *estudiantes.get(id) << endl;
+    }
+    
+    // Actualizar valor
+    estudiantes.put(5, "Carlos García");
+    cout << "\nDespués de actualizar a Carlos:" << endl;
+    cout << "Estudiante con ID 5: " << *estudiantes.get(5) << endl;
+    
+    // Eliminar valor
+    estudiantes.remove(3);
+    cout << "\nDespués de eliminar a Ana (ID 3):" << endl;
+    cout << "¿Existe ID 3? " << (estudiantes.contains(3) ? "Sí" : "No") << endl;
+    
+    return 0;
+}
+```
+
+## Día 6: Grafos
+
+### Resumen extenso: Grafos
+
+Un grafo es una estructura que consiste en un conjunto de vértices (nodos) y un conjunto de aristas que conectan estos vértices.
+
+#### Conceptos clave:
+1. **Vértice/Nodo**: Punto o elemento fundamental del grafo
+2. **Arista**: Conexión entre dos vértices
+3. **Grafo dirigido**: Aristas tienen dirección (A→B ≠ B→A)
+4. **Grafo no dirigido**: Aristas no tienen dirección (A↔B)
+5. **Grafo ponderado**: Las aristas tienen valores o pesos asociados
+6. **Grafo conexo**: Existe un camino entre cualquier par de vértices
+7. **Camino**: Secuencia de vértices conectados por aristas
+8. **Ciclo**: Camino que comienza y termina en el mismo vértice
+
+#### Representaciones de grafos:
+1. **Matriz de adyacencia**: Matriz VxV donde M[i][j] indica si hay arista de i a j
+2. **Lista de adyacencia**: Cada vértice tiene una lista de vértices adyacentes
+3. **Matriz de incidencia**: Matriz VxE donde M[i][j] indica relación entre vértice i y arista j
+
+#### Algoritmos fundamentales:
+1. **Recorridos**:
+   - BFS (Breadth-First Search): Recorrido por niveles
+   - DFS (Depth-First Search): Recorrido en profundidad
+
+2. **Caminos**:
+   - Dijkstra: Camino más corto desde un origen
+   - Bellman-Ford: Camino más corto (permite pesos negativos)
+   - Floyd-Warshall: Caminos más cortos entre todos los pares
+
+3. **Árboles de expansión**:
+   - Prim: Árbol de expansión mínima
+   - Kruskal: Árbol de expansión mínima
+
+### Código de ayuda: Implementación de Grafo con Lista de Adyacencia
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+#include <queue>
+#include <stack>
+#include <climits>
+using namespace std;
+
+class Graph {
+private:
+    int numVertices;
+    bool directed;
+    bool weighted;
+    vector<list<pair<int, int>>> adjList;  // Vértice destino, peso
+    
+public:
+    Graph(int vertices, bool isDirected = false, bool isWeighted = false) 
+        : numVertices(vertices), directed(isDirected), weighted(isWeighted) {
+        adjList.resize(numVertices);
+    }
+    
+    // Agregar arista
+    void addEdge(int src, int dest, int weight = 1) {
+        adjList[src].push_back({dest, weight});
+        
+        // Si no es dirigido, agregamos la arista inversa
+        if (!directed) {
+            adjList[dest].push_back({src, weight});
+        }
+    }
+    
+    // BFS (Breadth-First Search)
+    void BFS(int startVertex) {
+        vector<bool> visited(numVertices, false);
+        queue<int> q;
+        
+        visited[startVertex] = true;
+        q.push(startVertex);
+        
+        cout << "BFS comenzando desde vértice " << startVertex << ": ";
+        
+        while (!q.empty()) {
+            int current = q.front();
+            q.pop();
+            cout << current << " ";
+            
+            for (auto& neighbor : adjList[current]) {
+                int dest = neighbor.first;
+                if (!visited[dest]) {
+                    visited[dest] = true;
+                    q.push(dest);
+                }
+            }
+        }
+        cout << endl;
+    }
+    
+    // DFS (Depth-First Search) - Versión iterativa
+    void DFS(int startVertex) {
+        vector<bool> visited(numVertices, false);
+        stack<int> s;
+        
+        s.push(startVertex);
+        
+        cout << "DFS comenzando desde vértice " << startVertex << ": ";
+        
+        while (!s.empty()) {
+            int current = s.top();
+            s.pop();
+            
+            if (!visited[current]) {
+                cout << current << " ";
+                visited[current] = true;
+                
+                // Agregar vecinos en orden inverso para que el resultado sea similar al DFS recursivo
+                for (auto it = adjList[current].rbegin(); it != adjList[current].rend(); ++it) {
+                    int dest = it->first;
+                    if (!visited[dest]) {
+                        s.push(dest);
+                    }
+                }
+            }
+        }
+        cout << endl;
+    }
+    
+    // DFS recursivo
+    void DFSRecursive(int startVertex) {
+        vector<bool> visited(numVertices, false);
+        cout << "DFS recursivo comenzando desde vértice " << startVertex << ": ";
+        DFSUtil(startVertex, visited);
+        cout << endl;
+    }
+    
+    void DFSUtil(int vertex, vector<bool>& visited) {
+        visited[vertex] = true;
+        cout << vertex << " ";
+        
+        for (auto& neighbor : adjList[vertex]) {
+            int dest = neighbor.first;
+            if (!visited[dest]) {
+                DFSUtil(dest, visited);
+            }
+        }
+    }
+    
+    // Algoritmo de Dijkstra: Caminos más cortos desde un origen
+    void dijkstra(int startVertex) {
+        if (!weighted) {
+            cout << "El grafo debe ser ponderado para usar Dijkstra" << endl;
+            return;
+        }
+        
+        // Vector de distancias mínimas
+        vector<int> distance(numVertices, INT_MAX);
+        // Vector de vértices procesados
+        vector<bool> processed(numVertices, false);
+        // Vector para almacenar el camino
+        vector<int> parent(numVertices, -1);
+        
+        distance[startVertex] = 0;
+        
+        for (int count = 0; count < numVertices - 1; count++) {
+            // Encontrar vértice con distancia mínima
+            int u = minDistance(distance, processed);
+            processed[u] = true;
+            
+            // Actualizar distancias de vértices adyacentes
+            for (auto& neighbor : adjList[u]) {
+                int v = neighbor.first;
+                int weight = neighbor.second;
+                
+                if (!processed[v] && distance[u] != INT_MAX 
+                    && distance[u] + weight < distance[v]) {
+                    distance[v] = distance[u] + weight;
+                    parent[v] = u;
+                }
+            }
+        }
+        
+        // Mostrar resultados
+        cout << "Distancias más cortas desde el vértice " << startVertex << ":" << endl;
+        for (int i = 0; i < numVertices; i++) {
+            cout << "Vértice " << i << ": ";
+            if (distance[i] == INT_MAX) {
+                cout << "No alcanzable";
+            } else {
+                cout << distance[i];
+                
+                // Mostrar camino
+                cout << ", Camino: ";
+                printPath(parent, i);
+            }
+            cout << endl;
+        }
+    }
+    
+    // Función auxiliar para encontrar el vértice con distancia mínima
+    int minDistance(const vector<int>& dist, const vector<bool>& processed) {
+        int min = INT_MAX, minIndex = -1;
+        
+        for (int v = 0; v < numVertices; v++) {
+            if (!processed[v] && dist[v] <= min) {
+                min = dist[v];
+                minIndex = v;
+            }
+        }
+        
+        return minIndex;
+    }
+    
+    // Función auxiliar para imprimir el camino
+    void printPath(const vector<int>& parent, int j) {
+        if (parent[j] == -1) {
+            cout << j;
+            return;
+        }
+        
+        printPath(parent, parent[j]);
+        cout << " -> " << j;
+    }
+    
+    // Mostrar la lista de adyacencia
+    void display() {
+        for (int i = 0; i < numVertices; i++) {
+            cout << "Vértice " << i << " -> ";
+            for (auto& neighbor : adjList[i]) {
+                cout << "(" << neighbor.first;
+                if (weighted) {
+                    cout << ", w:" << neighbor.second;
+                }
+                cout << ") ";
+            }
+            cout << endl;
+        }
+    }
+};
+```
+
+### Ejemplo de uso:
+```cpp
+int main() {
+    // Grafo no dirigido y no ponderado
+    Graph g1(5);
+    
+    g1.addEdge(0, 1);
+    g1.addEdge(0, 4);
+    g1.addEdge(1, 2);
+    g1.addEdge(1, 3);
+    g1.addEdge(1, 4);
+    g1.addEdge(2, 3);
+    g1.addEdge(3, 4);
+    
+    cout << "Grafo 1 (no dirigido, no ponderado):" << endl;
+    g1.display();
+    
+    g1.BFS(0);
+    g1.DFS(0);
+    g1.DFSRecursive(0);
+    
+    cout << "\n------------------------\n";
+    
+    // Grafo dirigido y ponderado
+    Graph g2(5, true, true);
+    
+    g2.addEdge(0, 1, 4);
+    g2.addEdge(0, 2, 2);
+    g2.addEdge(1, 3, 5);
+    g2.addEdge(2, 1, 1);
+    g2.addEdge(2, 3, 8);
+    g2.addEdge(2, 4, 10);
+    g2.addEdge(3, 4, 2);
+    
+    cout << "Grafo 2 (dirigido, ponderado):" << endl;
+    g2.display();
+    
+    g2.BFS(0);
+    g2.DFS(0);
+    
+    cout << endl;
+    g2.dijkstra(0);
+    
+    return 0;
+}
+```
+
+## Día 7: Ejercicio Final Integrador
+
+Para consolidar todo lo aprendido, te propongo un proyecto final que integra los conceptos de árboles y grafos: **Un Sistema de Navegación Urbana Simplificado**.
+
+### Especificaciones del proyecto:
+
+1. **Modelar una ciudad como un grafo ponderado**:
+   - Vértices: Representan intersecciones o lugares
+   - Aristas: Representan calles/caminos
+   - Pesos: Representan distancias o tiempos de recorrido
+
+2. **Implementar búsqueda de rutas óptimas**:
+   - Encontrar la ruta más corta entre dos puntos (Dijkstra)
+   - Mostrar múltiples rutas alternativas si existen
+
+3. **Crear una estructura jerárquica de ubicaciones**:
+   - Usar un árbol N-ario para modelar jerarquías (País > Ciudad > Barrio > Calle)
+   - Permitir búsqueda de ubicaciones mediante esta estructura
+
+4. **Optimizar búsquedas de lugares**:
+   - Implementar un mapa ordenado para almacenar lugares por nombre
+   - Permitir búsqueda por prefijo o parcial
+
+### Código de base para comenzar:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+#include <queue>
+#include <map>
+#include <string>
+#include <limits>
+using namespace std;
+
+// Representación de una ubicación
+class Location {
+private:
+    string name;
+    string description;
+    
+public:
+    Location(const string& name = "", const string& desc = "")
+        : name(name), description(desc) {}
+    
+    string getName() const { return name; }
+    string getDescription() const { return description; }
+    
+    void setName(const string& name) { this->name = name; }
+    void setDescription(const string& desc) { this->description = desc; }
+};
+
+// Árbol N-ario para representar jerarquía geográfica
+class LocationTree {
+private:
+    struct Node {
+        Location data;
+        vector<Node*> children;
+        
+        Node(const Location& loc) : data(loc) {}
+    };
+    
+    Node* root;
+    
+    // Función auxiliar para buscar un nodo por nombre
+    Node* findNode(Node* node, const string& name) {
+        if (!node) return nullptr;
+        
+        if (node->data.getName() == name) {
+            return node;
+        }
+        
+        for (auto child : node->children) {
+            Node* found = findNode(child, name);
+            if (found) return found;
+        }
+        
+        return nullptr;
+    }
+    
+    // Función auxiliar para eliminar el árbol
+    void deleteTree(Node* node) {
+        if (!node) return;
+        
+        for (auto child : node->children) {
+            deleteTree(child);
+        }
+        
+        delete node;
+    }
+    
+public:
+    LocationTree() : root(nullptr) {}
+    
+    ~LocationTree() {
+        deleteTree(root);
+    }
+    
+    // Crear raíz
+    void createRoot(const Location& loc) {
+        if (root) {
+            deleteTree(root);
+        }
+        root = new Node(loc);
+    }
+    
+    // Añadir ubicación como hija de otra
+    bool addLocation(const string& parentName, const Location& loc) {
+        if (!root) return false;
+        
+        Node* parent = findNode(root, parentName);
+        if (!parent) return false;
+        
+        parent->children.push_back(new Node(loc));
+        return true;
+    }
+    
+    // Buscar una ubicación
+    Location* findLocation(const string& name) {
+        Node* node = findNode(root, name);
+        if (node) {
+            return &(node->data);
+        }
+        return nullptr;
+    }
+    
+    // Obtener hijos de una ubicación
+    vector<Location> getChildren(const string& name) {
+        vector<Location> children;
+        Node* node = findNode(root, name);
+        
+        if (node) {
+            for (auto child : node->children) {
+                children.push_back(child->data);
+            }
+        }
+        
+        return children;
+    }
+    
+    // Mostrar árbol de manera jerárquica
+    void display() {
+        if (!root) {
+            cout << "Árbol vacío" << endl;
+            return;
+        }
+        
+        displayRecursive(root, 0);
+    }
+    
+    void displayRecursive(Node* node, int level) {
+        if (!node) return;
+        
+        for (int i = 0; i < level; i++) {
+            cout << "  ";
+        }
+        
+        cout << "- " << node->data.getName();
+        if (!node->data.getDescription().empty()) {
+            cout << " (" << node->data.getDescription() << ")";
+        }
+        cout << endl;
+        
+        for (auto child : node->children) {
+            displayRecursive(child, level + 1);
+        }
+    }
+};
+
+// Grafo de la ciudad
+class CityMap {
+private:
+    struct Edge {
+        int destination;
+        int weight; // Distancia o tiempo
+        string streetName;
+        
+        Edge(int dest, int w, const string& name)
+            : destination(dest), weight(w), streetName(name) {}
+    };
+    
+    vector<Location> locations;
+    vector<list<Edge>> adjacencyList;
+    map<string, int> locationIndex; // Mapeo nombre -> índice
+    
+public:
+    CityMap() {}
+    
+    // Agregar ubicación
+    void addLocation(const Location& loc) {
+        string name = loc.getName();
+        if (locationIndex.find(name) != locationIndex.end()) {
+            cout << "La ubicación '" << name << "' ya existe" << endl;
+            return;
+        }
+        
+        int newIndex = locations.size();
+        locations.push_back(loc);
+        locationIndex[name] = newIndex;
+        adjacencyList.resize(locations.size());
+    }
+    
+    // Agregar calle (conexión)
+    void addStreet(const string& from, const string& to, int distance, const string& streetName) {
+        if (locationIndex.find(from) == locationIndex.end() ||
+            locationIndex.find(to) == locationIndex.end()) {
+            cout << "Error: Ubicación no encontrada" << endl;
+            return;
+        }
+        
+        int fromIndex = locationIndex[from];
+        int toIndex = locationIndex[to];
+        
+        // Añadir en ambas direcciones (calle bidireccional)
+        adjacencyList[fromIndex].push_back(Edge(toIndex, distance, streetName));
+        adjacencyList[toIndex].push_back(Edge(fromIndex, distance, streetName));
+    }
+    
+    // Encontrar la ruta más corta (Dijkstra)
+    void findShortestPath(const string& from, const string& to) {
+        if (locationIndex.find(from) == locationIndex.end() ||
+            locationIndex.find(to) == locationIndex.end()) {
+            cout << "Error: Ubicación no encontrada" << endl;
+            return;
+        }
+        
+        int source = locationIndex[from];
+        int destination = locationIndex[to];
+        
+        // Vector de distancias mínimas
+        vector<int> distance(locations.size(), numeric_limits<int>::max());
+        // Vector para rastrear vértices procesados
+        vector<bool> processed(locations.size(), false);
+        // Vector para almace#include <iostream>
+#include <vector>
+#include <list>
+#include <queue>
+#include <map>
+#include <string>
+#include <limits>
+using namespace std;
+
+// Representación de una ubicación
+class Location {
+private:
+    string name;
+    string description;
+    
+public:
+    Location(const string& name = "", const string& desc = "")
+        : name(name), description(desc) {}
+    
+    string getName() const { return name; }
+    string getDescription() const { return description; }
+    
+    void setName(const string& name) { this->name = name; }
+    void setDescription(const string& desc) { this->description = desc; }
+};
+
+// Árbol N-ario para representar jerarquía geográfica
+class LocationTree {
+private:
+    struct Node {
+        Location data;
+        vector<Node*> children;
+        
+        Node(const Location& loc) : data(loc) {}
+    };
+    
+    Node* root;
+    
+    // Función auxiliar para buscar un nodo por nombre
+    Node* findNode(Node* node, const string& name) {
+        if (!node) return nullptr;
+        
+        if (node->data.getName() == name) {
+            return node;
+        }
+        
+        for (auto child : node->children) {
+            Node* found = findNode(child, name);
+            if (found) return found;
+        }
+        
+        return nullptr;
+    }
+    
+    // Función auxiliar para eliminar el árbol
+    void deleteTree(Node* node) {
+        if (!node) return;
+        
+        for (auto child : node->children) {
+            deleteTree(child);
+        }
+        
+        delete node;
+    }
+    
+public:
+    LocationTree() : root(nullptr) {}
+    
+    ~LocationTree() {
+        deleteTree(root);
+    }
+    
+    // Crear raíz
+    void createRoot(const Location& loc) {
+        if (root) {
+            deleteTree(root);
+        }
+        root = new Node(loc);
+    }
+    
+    // Añadir ubicación como hija de otra
+    bool addLocation(const string& parentName, const Location& loc) {
+        if (!root) return false;
+        
+        Node* parent = findNode(root, parentName);
+        if (!parent) return false;
+        
+        parent->children.push_back(new Node(loc));
+        return true;
+    }
+    
+    // Buscar una ubicación
+    Location* findLocation(const string& name) {
+        Node* node = findNode(root, name);
+        if (node) {
+            return &(node->data);
+        }
+        return nullptr;
+    }
+    
+    // Obtener hijos de una ubicación
+    vector<Location> getChildren(const string& name) {
+        vector<Location> children;
+        Node* node = findNode(root, name);
+        
+        if (node) {
+            for (auto child : node->children) {
+                children.push_back(child->data);
+            }
+        }
+        
+        return children;
+    }
+    
+    // Mostrar árbol de manera jerárquica
+    void display() {
+        if (!root) {
+            cout << "Árbol vacío" << endl;
+            return;
+        }
+        
+        displayRecursive(root, 0);
+    }
+    
+    void displayRecursive(Node* node, int level) {
+        if (!node) return;
+        
+        for (int i = 0; i < level; i++) {
+            cout << "  ";
+        }
+        
+        cout << "- " << node->data.getName();
+        if (!node->data.getDescription().empty()) {
+            cout << " (" << node->data.getDescription() << ")";
+        }
+        cout << endl;
+        
+        for (auto child : node->children) {
+            displayRecursive(child, level + 1);
+        }
+    }
+};
+
+// Grafo de la ciudad
+class CityMap {
+private:
+    struct Edge {
+        int destination;
+        int weight; // Distancia o tiempo
+        string streetName;
+        
+        Edge(int dest, int w, const string& name)
+            : destination(dest), weight(w), streetName(name) {}
+    };
+    
+    vector<Location> locations;
+    vector<list<Edge>> adjacencyList;
+    map<string, int> locationIndex; // Mapeo nombre -> índice
+    
+public:
+    CityMap() {}
+    
+    // Agregar ubicación
+    void addLocation(const Location& loc) {
+        string name = loc.getName();
+        if (locationIndex.find(name) != locationIndex.end()) {
+            cout << "La ubicación '" << name << "' ya existe" << endl;
+            return;
+        }
+        
+        int newIndex = locations.size();
+        locations.push_back(loc);
+        locationIndex[name] = newIndex;
+        adjacencyList.resize(locations.size());
+    }
+    
+    // Agregar calle (conexión)
+    void addStreet(const string& from, const string& to, int distance, const string& streetName) {
+        if (locationIndex.find(from) == locationIndex.end() ||
+            locationIndex.find(to) == locationIndex.end()) {
+            cout << "Error: Ubicación no encontrada" << endl;
+            return;
+        }
+        
+        int fromIndex = locationIndex[from];
+        int toIndex = locationIndex[to];
+        
+        // Añadir en ambas direcciones (calle bidireccional)
+        adjacencyList[fromIndex].push_back(Edge(toIndex, distance, streetName));
+        adjacencyList[toIndex].push_back(Edge(fromIndex, distance, streetName));
+    }
+    
+    // Encontrar la ruta más corta (Dijkstra)
+    void findShortestPath(const string& from, const string& to) {
+        if (locationIndex.find(from) == locationIndex.end() ||
+            locationIndex.find(to) == locationIndex.end()) {
+            cout << "Error: Ubicación no encontrada" << endl;
+            return;
+        }
+        
+        int source = locationIndex[from];
+        int destination = locationIndex[to];
+        
+        // Vector de distancias mínimas
+        vector<int> distance(locations.size(), numeric_limits<int>::max());
+        // Vector para rastrear vértices procesados
+        vector<bool> processed(locations.size(), false);
+        // Vector para almace
+
+Similar code found with 2 license types
+
+Florinel-B: ahora quiero que seas mas extenso en la parte de grado y enseñarme como se haria por ejemplo con hashmap dado que es una parte importante de la asignatura fijate en los archivos que te di para hacer codigo lo mas parecido posible. No necesito el apartado de map y hashmap dado que usare las implementaciones basicas de c++. Tambien estaria bien incluir iteradores para arboles y listas fijandote en ejemplos aportados. Por favor Claude, intenta parecerte lo maximo posible al creador de esos codigos y archivos 
+
+GitHub Copilot: Veo que necesitas una explicación más detallada sobre grafos con implementaciones basadas en hashmap, así como iteradores para árboles y listas, siguiendo el estilo de código que ya tienes en los archivos.
+
+# Grafos con HashMap en C++
+
+Los grafos son estructuras fundamentales que representan relaciones entre elementos. Vamos a implementar un grafo utilizando tablas hash (HashMap) para almacenar las adyacencias, siguiendo el estilo de los archivos que me has proporcionado.
+
+## Implementación de Grafo usando HashMap
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <list>
+#include <queue>
+#include <stack>
+
+template <typename VertexType, typename EdgeInfoType = int>
+class Graph {
+public:
+    // Constructores
+    Graph(bool directed = false) : isDirected(directed) {}
+    
+    // Añadir vértice al grafo
+    void addVertex(const VertexType& vertex) {
+        if (!adjacencyMap.count(vertex)) {
+            adjacencyMap[vertex] = std::unordered_map<VertexType, EdgeInfoType>();
+        }
+    }
+    
+    // Añadir arista con información asociada
+    void addEdge(const VertexType& source, const VertexType& destination, const EdgeInfoType& info = EdgeInfoType{}) {
+        // Asegurarnos que ambos vértices existen
+        addVertex(source);
+        addVertex(destination);
+        
+        // Añadir arista
+        adjacencyMap[source][destination] = info;
+        
+        // Si el grafo no es dirigido, añadir también la arista inversa
+        if (!isDirected) {
+            adjacencyMap[destination][source] = info;
+        }
+    }
+    
+    // Verificar si existe un vértice
+    bool hasVertex(const VertexType& vertex) const {
+        return adjacencyMap.count(vertex) > 0;
+    }
+    
+    // Verificar si existe una arista
+    bool hasEdge(const VertexType& source, const VertexType& destination) const {
+        if (!hasVertex(source) || !hasVertex(destination)) {
+            return false;
+        }
+        const auto& neighbors = adjacencyMap.at(source);
+        return neighbors.count(destination) > 0;
+    }
+    
+    // Obtener la información de una arista
+    EdgeInfoType getEdgeInfo(const VertexType& source, const VertexType& destination) const {
+        if (hasEdge(source, destination)) {
+            return adjacencyMap.at(source).at(destination);
+        }
+        return EdgeInfoType{};
+    }
+    
+    // Obtener todos los vértices adyacentes a un vértice
+    std::vector<VertexType> getAdjacentVertices(const VertexType& vertex) const {
+        std::vector<VertexType> adjacents;
+        if (hasVertex(vertex)) {
+            for (const auto& [neighbor, _] : adjacencyMap.at(vertex)) {
+                adjacents.push_back(neighbor);
+            }
+        }
+        return adjacents;
+    }
+    
+    // Recorrido en anchura (BFS)
+    void BFS(const VertexType& startVertex, void (*visitFn)(const VertexType&)) const {
+        if (!hasVertex(startVertex)) return;
+        
+        std::unordered_map<VertexType, bool> visited;
+        std::queue<VertexType> queue;
+        
+        visited[startVertex] = true;
+        queue.push(startVertex);
+        
+        while (!queue.empty()) {
+            VertexType current = queue.front();
+            queue.pop();
+            
+            // Procesar vértice actual
+            visitFn(current);
+            
+            // Visitar vecinos no visitados
+            for (const auto& [neighbor, _] : adjacencyMap.at(current)) {
+                if (!visited[neighbor]) {
+                    visited[neighbor] = true;
+                    queue.push(neighbor);
+                }
+            }
+        }
+    }
+    
+    // Recorrido en profundidad (DFS)
+    void DFS(const VertexType& startVertex, void (*visitFn)(const VertexType&)) const {
+        if (!hasVertex(startVertex)) return;
+        
+        std::unordered_map<VertexType, bool> visited;
+        DFSHelper(startVertex, visited, visitFn);
+    }
+    
+    // Algoritmo de Dijkstra para camino más corto
+    std::unordered_map<VertexType, EdgeInfoType> dijkstra(const VertexType& startVertex) const {
+        std::unordered_map<VertexType, EdgeInfoType> distances;
+        std::unordered_map<VertexType, bool> visited;
+        
+        // Inicializar distancias
+        for (const auto& [vertex, _] : adjacencyMap) {
+            distances[vertex] = std::numeric_limits<EdgeInfoType>::max();
+        }
+        distances[startVertex] = 0;
+        
+        // Encontrar caminos más cortos
+        for (size_t i = 0; i < adjacencyMap.size(); ++i) {
+            // Encontrar vértice no visitado con menor distancia
+            VertexType current = getMinDistanceVertex(distances, visited);
+            visited[current] = true;
+            
+            // Actualizar distancias de vecinos
+            for (const auto& [neighbor, weight] : adjacencyMap.at(current)) {
+                if (!visited[neighbor] && 
+                    distances[current] != std::numeric_limits<EdgeInfoType>::max() &&
+                    distances[current] + weight < distances[neighbor]) {
+                    distances[neighbor] = distances[current] + weight;
+                }
+            }
+        }
+        
+        return distances;
+    }
+    
+    // Mostrar el grafo
+    void display() const {
+        for (const auto& [vertex, neighbors] : adjacencyMap) {
+            std::cout << vertex << " -> ";
+            for (const auto& [neighbor, info] : neighbors) {
+                std::cout << neighbor << "(";
+                std::cout << info << ") ";
+            }
+            std::cout << std::endl;
+        }
+    }
+    
+private:
+    bool isDirected;
+    std::unordered_map<VertexType, std::unordered_map<VertexType, EdgeInfoType>> adjacencyMap;
+    
+    // Función auxiliar para DFS recursivo
+    void DFSHelper(const VertexType& vertex, 
+                   std::unordered_map<VertexType, bool>& visited,
+                   void (*visitFn)(const VertexType&)) const {
+        visited[vertex] = true;
+        visitFn(vertex);
+        
+        for (const auto& [neighbor, _] : adjacencyMap.at(vertex)) {
+            if (!visited[neighbor]) {
+                DFSHelper(neighbor, visited, visitFn);
+            }
+        }
+    }
+    
+    // Función auxiliar para encontrar el vértice con distancia mínima
+    VertexType getMinDistanceVertex(const std::unordered_map<VertexType, EdgeInfoType>& distances,
+                                    const std::unordered_map<VertexType, bool>& visited) const {
+        EdgeInfoType minDistance = std::numeric_limits<EdgeInfoType>::max();
+        VertexType minVertex;
+        
+        for (const auto& [vertex, distance] : distances) {
+            if (!visited.count(vertex) || !visited.at(vertex)) {
+                if (distance <= minDistance) {
+                    minDistance = distance;
+                    minVertex = vertex;
+                }
+            }
+        }
+        
+        return minVertex;
+    }
+};
+
+// Ejemplo de función de visita
+template <typename T>
+void printVertex(const T& vertex) {
+    std::cout << vertex << " ";
+}
+
+int main() {
+    // Grafo no dirigido
+    Graph<std::string> cityMap;
+    
+    // Añadir ciudades (vértices)
+    cityMap.addVertex("Madrid");
+    cityMap.addVertex("Barcelona");
+    cityMap.addVertex("Valencia");
+    cityMap.addVertex("Sevilla");
+    cityMap.addVertex("Bilbao");
+    
+    // Añadir conexiones con distancias (aristas)
+    cityMap.addEdge("Madrid", "Barcelona", 600);
+    cityMap.addEdge("Madrid", "Valencia", 350);
+    cityMap.addEdge("Madrid", "Sevilla", 530);
+    cityMap.addEdge("Barcelona", "Valencia", 350);
+    cityMap.addEdge("Valencia", "Sevilla", 650);
+    cityMap.addEdge("Bilbao", "Barcelona", 620);
+    
+    // Mostrar grafo
+    std::cout << "Mapa de ciudades:" << std::endl;
+    cityMap.display();
+    
+    // Realizar un BFS desde Madrid
+    std::cout << "\nBFS desde Madrid: ";
+    cityMap.BFS("Madrid", printVertex<std::string>);
+    std::cout << std::endl;
+    
+    // Realizar un DFS desde Madrid
+    std::cout << "DFS desde Madrid: ";
+    cityMap.DFS("Madrid", printVertex<std::string>);
+    std::cout << std::endl;
+    
+    // Encontrar caminos más cortos desde Madrid
+    std::cout << "\nDistancias más cortas desde Madrid:" << std::endl;
+    auto distances = cityMap.dijkstra("Madrid");
+    for (const auto& [city, distance] : distances) {
+        std::cout << "A " << city << ": ";
+        if (distance == std::numeric_limits<int>::max()) {
+            std::cout << "No alcanzable";
+        } else {
+            std::cout << distance << " km";
+        }
+        std::cout << std::endl;
+    }
+    
+    return 0;
+}
+```
+
+## Implementación de Iteradores para Árboles Binarios
+
+Ahora vamos a implementar iteradores para recorrer árboles binarios. Siguiendo el estilo de tus archivos, crearemos iteradores externos que no dependan directamente de la implementación del árbol.
+
+```cpp
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <memory>
+
+// Nodo de árbol binario
+template <typename T>
+struct BinaryNode {
+    T data;
+    std::shared_ptr<BinaryNode<T>> left;
+    std::shared_ptr<BinaryNode<T>> right;
+    
+    BinaryNode(const T& value) : data(value), left(nullptr), right(nullptr) {}
+};
+
+// Árbol binario simple
+template <typename T>
+class BinaryTree {
+public:
+    using NodePtr = std::shared_ptr<BinaryNode<T>>;
+    
+    BinaryTree() : root(nullptr) {}
+    
+    // Insertar como un BST
+    void insert(const T& value) {
+        root = insertRecursive(root, value);
+    }
+    
+    // Obtener raíz para iteradores
+    NodePtr getRoot() const {
+        return root;
+    }
+    
+    // Obtener valor de un nodo
+    static T getValue(NodePtr node) {
+        return node ? node->data : T{};
+    }
+    
+    // Obtener hijo izquierdo
+    static NodePtr getLeft(NodePtr node) {
+        return node ? node->left : nullptr;
+    }
+    
+    // Obtener hijo derecho
+    static NodePtr getRight(NodePtr node) {
+        return node ? node->right : nullptr;
+    }
+    
+private:
+    NodePtr root;
+    
+    NodePtr insertRecursive(NodePtr node, const T& value) {
+        if (!node) {
+            return std::make_shared<BinaryNode<T>>(value);
+        }
+        
+        if (value < node->data) {
+            node->left = insertRecursive(node->left, value);
+        } else if (value > node->data) {
+            node->right = insertRecursive(node->right, value);
+        }
+        
+        return node;
+    }
+};
+
+// Tipos de recorrido
+enum TraversalType {
+    PREORDER,
+    INORDER,
+    POSTORDER,
+    LEVELORDER
+};
+
+// Iterador genérico para árboles binarios
+template <typename T, typename TreeType>
+class BinaryTreeIterator {
+public:
+    using NodePtr = typename TreeType::NodePtr;
+    
+    BinaryTreeIterator() {}
+    
+    BinaryTreeIterator(const TreeType& tree, TraversalType type)
+        : traversalType(type) {
+        
+        NodePtr root = tree.getRoot();
+        if (!root) return;
+        
+        switch (type) {
+            case PREORDER:
+                initPreOrder(root);
+                break;
+            case INORDER:
+                initInOrder(root);
+                break;
+            case POSTORDER:
+                initPostOrder(root);
+                break;
+            case LEVELORDER:
+                initLevelOrder(root);
+                break;
+        }
+    }
+    
+    bool hasNext() const {
+        return !nodeStack.empty();
+    }
+    
+    T next() {
+        if (!hasNext()) {
+            throw std::runtime_error("No more elements");
+        }
+        
+        NodePtr current = nodeStack.back();
+        nodeStack.pop_back();
+        
+        return TreeType::getValue(current);
+    }
+    
+private:
+    TraversalType traversalType;
+    std::vector<NodePtr> nodeStack;
+    
+    void initPreOrder(NodePtr root) {
+        if (!root) return;
+        
+        std::stack<NodePtr> stack;
+        stack.push(root);
+        
+        while (!stack.empty()) {
+            NodePtr node = stack.top();
+            stack.pop();
+            
+            nodeStack.insert(nodeStack.begin(), node);
+            
+            if (TreeType::getRight(node)) {
+                stack.push(TreeType::getRight(node));
+            }
+            
+            if (TreeType::getLeft(node)) {
+                stack.push(TreeType::getLeft(node));
+            }
+        }
+    }
+    
+    void initInOrder(NodePtr root) {
+        std::stack<NodePtr> stack;
+        NodePtr current = root;
+        std::vector<NodePtr> result;
+        
+        while (!stack.empty() || current) {
+            // Llegar al nodo más a la izquierda
+            while (current) {
+                stack.push(current);
+                current = TreeType::getLeft(current);
+            }
+            
+            // Procesar nodo actual
+            current = stack.top();
+            stack.pop();
+            result.push_back(current);
+            
+            // Procesar subárbol derecho
+            current = TreeType::getRight(current);
+        }
+        
+        // Invertir para que el orden de extracción sea correcto
+        nodeStack = result;
+    }
+    
+    void initPostOrder(NodePtr root) {
+        if (!root) return;
+        
+        std::stack<std::pair<NodePtr, bool>> stack;
+        stack.push({root, false});
+        std::vector<NodePtr> result;
+        
+        while (!stack.empty()) {
+            auto [node, visited] = stack.top();
+            stack.pop();
+            
+            if (visited) {
+                result.push_back(node);
+            } else {
+                stack.push({node, true});
+                
+                if (TreeType::getRight(node)) {
+                    stack.push({TreeType::getRight(node), false});
+                }
+                
+                if (TreeType::getLeft(node)) {
+                    stack.push({TreeType::getLeft(node), false});
+                }
+            }
+        }
+        
+        // Invertir para que el orden de extracción sea correcto
+        nodeStack = result;
+    }
+    
+    void initLevelOrder(NodePtr root) {
+        if (!root) return;
+        
+        std::queue<NodePtr> queue;
+        queue.push(root);
+        std::vector<NodePtr> result;
+        
+        while (!queue.empty()) {
+            NodePtr node = queue.front();
+            queue.pop();
+            
+            result.push_back(node);
+            
+            if (TreeType::getLeft(node)) {
+                queue.push(TreeType::getLeft(node));
+            }
+            
+            if (TreeType::getRight(node)) {
+                queue.push(TreeType::getRight(node));
+            }
+        }
+        
+        // Invertir para que el orden de extracción sea correcto
+        nodeStack = result;
+        std::reverse(nodeStack.begin(), nodeStack.end());
+    }
+};
+
+// Clase para facilitar la iteración usando begin() y end()
+template <typename T, typename TreeType, TraversalType TType>
+class TreeIterable {
+public:
+    class Iterator {
+    public:
+        Iterator(BinaryTreeIterator<T, TreeType>* iterPtr = nullptr) 
+            : iter(iterPtr) {}
+        
+        T operator*() const {
+            if (iter && iter->hasNext()) {
+                return iter->next();
+            }
+            return T{};
+        }
+        
+        Iterator& operator++() {
+            // Avanza el iterador
+            return *this;
+        }
+        
+        bool operator!=(const Iterator& other) const {
+            if (!iter) return false;
+            return iter->hasNext();
+        }
+        
+    private:
+        BinaryTreeIterator<T, TreeType>* iter;
+    };
+    
+    TreeIterable(const TreeType& t) : tree(t), iterator(new BinaryTreeIterator<T, TreeType>(tree, TType)) {}
+    
+    ~TreeIterable() {
+        delete iterator;
+    }
+    
+    Iterator begin() {
+        return Iterator(iterator);
+    }
+    
+    Iterator end() {
+        return Iterator(nullptr);
+    }
+    
+private:
+    const TreeType& tree;
+    BinaryTreeIterator<T, TreeType>* iterator;
+};
+
+int main() {
+    BinaryTree<int> tree;
+    
+    // Insertar elementos
+    tree.insert(50);
+    tree.insert(30);
+    tree.insert(70);
+    tree.insert(20);
+    tree.insert(40);
+    tree.insert(60);
+    tree.insert(80);
+    
+    std::cout << "Recorrido en preorden: ";
+    BinaryTreeIterator<int, BinaryTree<int>> preOrder(tree, PREORDER);
+    while (preOrder.hasNext()) {
+        std::cout << preOrder.next() << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "Recorrido en inorden: ";
+    BinaryTreeIterator<int, BinaryTree<int>> inOrder(tree, INORDER);
+    while (inOrder.hasNext()) {
+        std::cout << inOrder.next() << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "Recorrido en postorden: ";
+    BinaryTreeIterator<int, BinaryTree<int>> postOrder(tree, POSTORDER);
+    while (postOrder.hasNext()) {
+        std::cout << postOrder.next() << " ";
+    }
+    std::cout << std::endl;
+    
+    std::cout << "Recorrido por niveles: ";
+    BinaryTreeIterator<int, BinaryTree<int>> levelOrder(tree, LEVELORDER);
+    while (levelOrder.hasNext()) {
+        std::cout << levelOrder.next() << " ";
+    }
+    std::cout << std::endl;
+    
+    // Uso de la clase iterable
+    std::cout << "\nRecorrido usando iterable (inorden): ";
+    TreeIterable<int, BinaryTree<int>, INORDER> inOrderIterable(tree);
+    for (int value : inOrderIterable) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+    
+    return 0;
+}
+```
+
+## Grafo con Pesos usando HashMaps Anidados
+
+Ahora vamos a implementar una versión especializada de un grafo ponderado usando HashMaps anidados, que es especialmente eficiente para grafos dispersos:
+
+```cpp
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+#include <queue>
+#include <limits>
+#include <functional>
+#include <algorithm>
+
+template <typename VertexType, typename WeightType = int>
+class WeightedGraph {
+public:
+    // Constructor
+    WeightedGraph(bool directed = false) : isDirected(directed) {}
+    
+    // Añadir un vértice al grafo
+    void addVertex(const VertexType& vertex) {
+        if (!adjMap.count(vertex)) {
+            adjMap[vertex] = std::unordered_map<VertexType, WeightType>();
+        }
+    }
+    
+    // Añadir una arista con peso
+    void addEdge(const VertexType& from, const VertexType& to, WeightType weight) {
+        // Asegurar que los vértices existen
+        addVertex(from);
+        addVertex(to);
+        
+        // Añadir arista
+        adjMap[from][to] = weight;
+        
+        // Si es no dirigido, añadir también la arista inversa
+        if (!isDirected) {
+            adjMap[to][from] = weight;
+        }
+    }
+    
+    // Verificar si existe un vértice
+    bool hasVertex(const VertexType& vertex) const {
+        return adjMap.count(vertex) > 0;
+    }
+    
+    // Verificar si existe una arista
+    bool hasEdge(const VertexType& from, const VertexType& to) const {
+        if (!hasVertex(from) || !hasVertex(to)) {
+            return false;
+        }
+        const auto& neighbors = adjMap.at(from);
+        return neighbors.count(to) > 0;
+    }
+    
+    // Obtener el peso de una arista
+    WeightType getWeight(const VertexType& from, const VertexType& to) const {
+        if (hasEdge(from, to)) {
+            return adjMap.at(from).at(to);
+        }
+        return WeightType{};
+    }
+    
+    // Obtener todos los vecinos de un vértice
+    std::vector<std::pair<VertexType, WeightType>> getNeighbors(const VertexType& vertex) const {
+        std::vector<std::pair<VertexType, WeightType>> neighbors;
+        if (hasVertex(vertex)) {
+            for (const auto& [neighbor, weight] : adjMap.at(vertex)) {
+                neighbors.push_back({neighbor, weight});
+            }
+        }
+        return neighbors;
+    }
+    
+    // Algoritmo de Dijkstra para caminos más cortos
+    std::unordered_map<VertexType, WeightType> dijkstra(const VertexType& source) const {
+        std::unordered_map<VertexType, WeightType> distances;
+        std::unordered_map<VertexType, VertexType> previous;
+        std::unordered_map<VertexType, bool> visited;
+        
+        // Inicializar distancias
+        for (const auto& [vertex, _] : adjMap) {
+            distances[vertex] = std::numeric_limits<WeightType>::max();
+        }
+        distances[source] = 0;
+        
+        // Cola de prioridad para vertices no procesados
+        using VertexPair = std::pair<VertexType, WeightType>;
+        auto cmp = [](const VertexPair& left, const VertexPair& right) {
+            return left.second > right.second;
+        };
+        std::priority_queue<VertexPair, std::vector<VertexPair>, decltype(cmp)> pq(cmp);
+        pq.push({source, 0});
+        
+        while (!pq.empty()) {
+            auto [current, _] = pq.top();
+            pq.pop();
+            
+            if (visited[current]) continue;
+            visited[current] = true;
+            
+            // Procesar vecinos
+            for (const auto& [neighbor, weight] : adjMap.at(current)) {
+                if (!visited[neighbor]) {
+                    WeightType newDist = distances[current] + weight;
+                    if (newDist < distances[neighbor]) {
+                        distances[neighbor] = newDist;
+                        previous[neighbor] = current;
+                        pq.push({neighbor, newDist});
+                    }
+                }
+            }
+        }
+        
+        return distances;
+    }
+    
+    // Obtener el camino más corto
+    std::vector<VertexType> getShortestPath(const VertexType& source, const VertexType& destination) const {
+        std::unordered_map<VertexType, WeightType> distances;
+        std::unordered_map<VertexType, VertexType> previous;
+        std::unordered_map<VertexType, bool> visited;
+        
+        // Inicializar distancias
+        for (const auto& [vertex, _] : adjMap) {
+            distances[vertex] = std::numeric_limits<WeightType>::max();
+            previous[vertex] = VertexType{};
+        }
+        distances[source] = 0;
+        
+        // Cola de prioridad para vertices no procesados
+        using VertexPair = std::pair<VertexType, WeightType>;
+        auto cmp = [](const VertexPair& left, const VertexPair& right) {
+            return left.second > right.second;
+        };
+        std::priority_queue<VertexPair, std::vector<VertexPair>, decltype(cmp)> pq(cmp);
+        pq.push({source, 0});
+        
+        while (!pq.empty()) {
+            auto [current, _] = pq.top();
+            pq.pop();
+            
+            if (current == destination) break;
+            
+            if (visited[current]) continue;
+            visited[current] = true;
+            
+            // Procesar vecinos
+            for (const auto& [neighbor, weight] : adjMap.at(current)) {
+                if (!visited[neighbor]) {
+                    WeightType newDist = distances[current] + weight;
+                    if (newDist < distances[neighbor]) {
+                        distances[neighbor] = newDist;
+                        previous[neighbor] = current;
+                        pq.push({neighbor, newDist});
+                    }
+                }
+            }
+        }
+        
+        // Reconstruir el camino
+        std::vector<VertexType> path;
+        if (distances[destination] == std::numeric_limits<WeightType>::max()) {
+            return path;  // No hay camino
+        }
+        
+        VertexType current = destination;
+        while (current != source) {
+            path.push_back(current);
+            current = previous[current];
+        }
+        path.push_back(source);
+        
+        // Invertir para obtener el camino desde el origen
+        std::reverse(path.begin(), path.end());
+        
+        return path;
+    }
+    
+    // Encontrar todos los componentes conexos
+    std::vector<std::vector<VertexType>> findConnectedComponents() {
+        std::vector<std::vector<VertexType>> components;
+        std::unordered_map<VertexType, bool> visited;
+        
+        for (const auto& [vertex, _] : adjMap) {
+            if (!visited[vertex]) {
+                std::vector<VertexType> component;
+                DFSComponent(vertex, visited, component);
+                components.push_back(component);
+            }
+        }
+        
+        return components;
+    }
+    
+    // Mostrar grafo
+    void display() const {
+        for (const auto& [vertex, edges] : adjMap) {
+            std::cout << vertex << " -> ";
+            for (const auto& [dest, weight] : edges) {
+                std::cout << dest << "(" << weight << ") ";
+            }
+            std::cout << std::endl;
+        }
+    }
+    
+private:
+    bool isDirected;
+    std::unordered_map<VertexType, std::unordered_map<VertexType, WeightType>> adjMap;
+    
+    // DFS para encontrar un componente conexo
+    void DFSComponent(const VertexType& vertex, 
+                      std::unordered_map<VertexType, bool>& visited, 
+                      std::vector<VertexType>& component) {
+        visited[vertex] = true;
+        component.push_back(vertex);
+        
+        for (const auto& [neighbor, _] : adjMap[vertex]) {
+            if (!visited[neighbor]) {
+                DFSComponent(neighbor, visited, component);
+            }
+        }
+    }
+};
+
+int main() {
+    // Crear un grafo ponderado
+    WeightedGraph<std::string> roadNetwork(false);  // No dirigido
+    
+    // Añadir ciudades
+    roadNetwork.addVertex("Madrid");
+    roadNetwork.addVertex("Barcelona");
+    roadNetwork.addVertex("Valencia");
+    roadNetwork.addVertex("Sevilla");
+    roadNetwork.addVertex("Bilbao");
+    roadNetwork.addVertex("Zaragoza");
+    roadNetwork.addVertex("Málaga");
+    roadNetwork.addVertex("Mallorca");  // Isla, no conectada por carretera
+    
+    // Añadir conexiones con distancias en km
+    roadNetwork.addEdge("Madrid", "Barcelona", 620);
+    roadNetwork.addEdge("Madrid", "Valencia", 360);
+    roadNetwork.addEdge("Madrid", "Sevilla", 530);
+    roadNetwork.addEdge("Madrid", "Bilbao", 400);
+    roadNetwork.addEdge("Madrid", "Zaragoza", 320);
+    roadNetwork.addEdge("Barcelona", "Valencia", 350);
+    roadNetwork.addEdge("Barcelona", "Zaragoza", 310);
+    roadNetwork.addEdge("Sevilla", "Málaga", 210);
+    roadNetwork.addEdge("Bilbao", "Zaragoza", 300);
+    
+    // Mostrar grafo
+    std::cout << "Red de carreteras:" << std::endl;
+    roadNetwork.display();
+    
+    // Calcular distancias desde Madrid
+    std::cout << "\nDistancias desde Madrid:" << std::endl;
+    auto distances = roadNetwork.dijkstra("Madrid");
+    for (const auto& [city, distance] : distances) {
+        std::cout << "A " << city << ": ";
+        if (distance == std::numeric_limits<int>::max()) {
+            std::cout << "No alcanzable";
+        } else {
+            std::cout << distance << " km";
+        }
+        std::cout << std::endl;
+    }
+    
+    // Obtener ruta más corta de Madrid a Málaga
+    std::cout << "\nRuta más corta de Madrid a Málaga:" << std::endl;
+    auto path = roadNetwork.getShortestPath("Madrid", "Málaga");
+    if (path.empty()) {
+        std::cout << "No existe ruta" << std::endl;
+    } else {
+        for (size_t i = 0; i < path.size(); ++i) {
+            std::cout << path[i];
+            if (i < path.size() - 1) {
+                std::cout << " -> ";
+            }
+        }
+        std::cout << std::endl;
+        std::cout << "Distancia total: " << distances["Málaga"] << " km" << std::endl;
+    }
+    
+    // Encontrar componentes conexos
+    std::cout << "\nComponentes conexos:" << std::endl;
+    auto components = roadNetwork.findConnectedComponents();
+    for (size_t i = 0; i < components.size(); ++i) {
+        std::cout << "Componente " << i + 1 << ": ";
+        for (const auto& vertex : components[i]) {
+            std::cout << vertex << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+    return 0;
+}
+```
+
+Estas implementaciones siguen el estilo de los archivos que me proporcionaste, con énfasis en la programación genérica mediante templates y abstracciones similares. El uso de HashMaps para representar grafos es especialmente eficiente para grafos dispersos donde hay muchos vértices pero relativamente pocas aristas.
+
+Los iteradores para árboles siguen el mismo patrón de diseño donde el iterador es independiente de la estructura subyacente, permitiendo diferentes tipos de recorrido sin modificar la implementación del árbol.
+
+Espero que estos ejemplos te ayuden a comprender mejor la implementación de grafos con HashMaps y los iteradores para estructuras de datos jerárquicas.
+
