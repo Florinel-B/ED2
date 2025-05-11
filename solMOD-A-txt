@@ -111,3 +111,158 @@ int equilibrioArbol(Node* nodo = const getRoot()) {
     return izq + der
 
 }
+
+
+std::vector<TElemento> PadresNoAbuelos(T Tree) {
+    auto raiz = getRoot(Tree)
+    std::stack<TElemento> recorrido
+    std::vector<TElemento> elem
+    recorrido.push(raiz)
+    while (!recorrido.empty()){
+        auto accElem = recorrido.top()
+        recorrido.pop()
+        auto left = getLeft(accElem)
+        auto right = getRight(accElem)
+        if (EsHoja(left) && EsHoja(right)){
+            elem.push_back(accElem)
+            continue
+        }
+        if(!EsHoja(left)) recorrido.push(left)
+        if(!EsHoja(right)) recorrido.push(right)
+    }
+    return elem
+}
+
+template <typename S>
+class grafo{
+    using ID = S::ID
+
+    grafo () : AdjList(), empleados() {    };
+    grafo(std::vector<std::pair<S,S>> lista) : {
+        for (const auto& [empleado, jefe] : lista) {
+            empleados[jefe.getID()] = jefe
+             empleados[empleado.getID()] = empleado
+            AdjList[jefe.getID()].insert(empleado.getID())
+        }
+    }
+
+    ID obtenerCEO(){
+        for (const auto& [idJEFE, empleados] : adjList){
+                bool jefe = true;
+                for (const auto& [id, empleados1] : adjList){
+                    if (id == idJEFE || !jefe){
+                        break;
+                    }
+                    jefe = empleados1.contains(idJEFE)
+            }
+            if (jefe) return idJEFE;
+        }
+    }
+
+    private :
+    std::unordered_map<ID, S> empleados
+    std::unordered_map<ID, std::unordered_set<ID>> AdjList 
+
+}
+template <typename S>
+class NaryTree{
+    using ID = S::ID
+    template <typename T>
+    class Node {
+        using ID = T::ID
+        friendClass NaryTree;
+        private: 
+            ID Data
+            Node* parent
+            unordered_set<std::shared_ptr<Node<T>>> empleadosDirectos
+        public: 
+        Node() : info(), parent(nullptr), children() {} 
+		Node(S e) : info(e), parent(nullptr), children() {} 
+		Node(S e, Node<S>* parent) : info(e), parent(parent), children() {} 
+    }
+    
+    public :
+        NaryTree() {} : raiz{}
+
+        NaryTree(grafo grafo) : {
+            auto id = grafo.obtenerCEO()
+            raiz = make_shared<Node<T>>(id)
+            for (const auto& elem : grafo::adjList[id]){
+                auto a  = std::make_shared<Node<T>>(elem, raiz.get())
+                raiz->empleadosDirectos.insert(a)
+                añadirInfo(elem, a.get())
+            }
+        } 
+
+        
+        
+
+
+        
+    private : 
+        std::shared_ptr<Node<T>> raiz;
+        void añadirInfo(grafo grado , Node* nodo){
+            for (const auto& elem : grafo::adjList[id]){
+                auto a = std::make_shared<Node<T>>(elem, nodo)
+                raiz->empleadosDirectos.insert(a)
+                añadirInfo(elem, a.get())
+            }
+        }
+}
+
+template <typename S>
+class LevelIterator {
+    using Type = S::ID
+    using Node = S::Node
+    LevelIterator () :arbol{}
+    LevelIterator (S tree, int level) : arbol(tree)  {
+        iranivel(tree, level);
+    } 
+
+    LevelIterator &operator++ ()  {
+        if (!cola.empty()){
+            auto vector = cola.front()
+            cola.pop()
+
+        }
+        return *this
+    }
+
+    
+    
+    LevelIterator operator++ (int)  {
+        auto tmp{this*};
+        operator++;
+        return tmp;
+    }
+
+    Type operator*() { return arbol.getElement(cola.front()); } // GET ELEMENT DEVUELVE UN VECTOR ITERABLE DE IDs para simplificacion
+    bool operator!=(const LevelIterator& other) const { return !(cola.empty() && other.cola.empty()); }
+
+    
+
+
+    private : 
+    S arbol;
+    std::queue<std::vector<std::shared_ptr<Node<Type>>>> cola;
+    void iranivel(S arbol, int level){
+        int depthacc = 0
+        Node acc = arbol.getRoot()
+        auto lastelem = acc->empleadosDirectos
+        cola.push(acc->empleadosDirectos)
+        while (!cola.empty()){
+            auto vector = cola.front()
+            cola.pop()
+            if (lastelem == vector) {
+                depthacc += 1
+            }
+            for (const auto& elem : vector) {
+                cola.push(elem->empleadosDirectos)
+            }
+            if (depthacc == level) {
+                return;
+            }
+        }
+    }
+
+}
