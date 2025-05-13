@@ -562,4 +562,191 @@ class netP2P{
 // T esa hasheable gracias al ip que contiene, supongo que ya esta declarado 
 
 }
+// EXAMEN EXTRAORDIANRIA
+EJ1 
+typename <template Z>
+class Graph {
+    using ID = Z::ID
+    Graph() : {}
+    Graph(Z elem) : {
+        if(pares.contains(elem)) return
+        pares.insert(elem.getID(), elem)
+        adjList[elem.getID()] = {}
+    }//dado este constructor se tiene que cumplir que por cada elem añadido se añade en la lista de adyacencias por lo tanto es una verificacion viable y fiable
+    bool isComplete(){
+        for (const auto& [clave, valor]: adjList){
+            if(valor.size() != pares.size()){
+                return false
+            }
+        }
+        return true;
+    }
+    private : 
+    std::unordered_map<ID, Z> pares;
+    std::unordered_map<ID, std::unordered_set<ID>> adjList;    
+}
+EJ2 
+
+struct fichero {
+    std::string nombre
+    std::string extension
+    unsingned long int bytes;
+    using ID = std::string
+    ID getID() {
+        return nombre
+    }
+    ID getExtention() {
+        return extension
+    }
+}
+
+struct directorio {
+    std::string nombre
+    std::string etiqueta
+    std::string fecha
+    unsingned long int tam = 0;
+    using ID = std::string
+    ID getID() {
+        return nombre
+    }
+}
+
+
+typename <template T, template FIC>
+class BinaryTree {
+    using ID = T::ID
+    typename <template F>
+    class Node {
+        friend Class BinaryTree;
+        private:
+        F data;
+        Node* parent;
+        std::vector<std::shared_ptr<Node>> hijos
+        public:
+        Node () : parent(nullptr)
+        Node (F data1, Node* parent1) : parent(parent1), data(data1)
+    }
+    Node* anyadirDirectorio (nombre, etiqueta, fecha ,Node* parent){
+        auto directorioNuevo = T{nombre,etiqueta,fecha,0}
+        auto nodo = std::make_shared<Node>
+        nodp->parent = parent
+        nodo->data = directorioNuevo
+        parent->hijos.insert(nodo)
+        espacio[directorioNuevo.getID()] = {}
+        return nodo.get()
+    }
+
+    void anyadirFichero(nombre, extension, tam, Node* padre){
+        auto newFile = FIC{nombre, extension, tam}
+        espacio[padre->data.getID()].insert(newFile)
+        aumentarTam(tam, padre)
+    }
+    void aumentarTam(unsingned long int tamanyo, Node* accNode){
+        if (!accNode)return
+        accNode->data.tam += tamanyo
+        aumentarTam(tamanyo, accNode->parent)
+    }
+
+    bool EliminarVacios(Node* nodo) {
+        if(nodo->hijos.empty() && espacio[nodo->data.getID()].empty()) {
+            std::cout << "elimindo << 
+            ID id = nodo->data.getID()
+            espacio.erase(id)
+            nodo->parent->hijos.erase(nodo)
+            return true
+        }
+        return false 
+    }
+
+    void Limpieza() {
+        std::queue<Node*> recorrido;
+        recorrido.push(raiz.get())
+        while (!recorrido.empty()){
+            auto Node = recorrido.top()
+            recorrido.pop()
+            if !EliminarVacios(Node){
+            for (const auto& elem: Node->hijos) recorrido.push(elem.get())
+            }
+        }
+    }
+    void BACKUPNode (BinaryTree<T, FIC> &bak, Node* posacc, Node* destino) {
+        for (const auto &dest : bak.espacio[posacc->data.getID()]){
+                anyadirFichero(dest.nombre, dest.extension, dest.tam, destino);
+        }
+        if (posacc->hijos,empty()) return
+        for (const auto &hijo : posacc->hijos){
+            auto destacc = anyadirDirectorio(hijo->data.nombre,hijo->data.etiqueta, hijo->data.fecha, dest);
+            BACKUPNode(*bak, hijo, destacc);
+        }
+
+    }
+
+    void BACKUP(BinaryTree<T, FIC> &bak, BinaryTree<T, FIC> dest){
+        Node* Node = dest.anyadirDirectorio("bak_" + bak.nombre, bak.raiz->data.extension, 0 , dest.raiz.get());
+        BACKUPNode(*bak, bak.raiz.get(), Node);
+    }
+
+    FIC BusquedaFichero(ID nombre, ID extension) { // yo al hacerlo con hashmap podria perfectamente pregutar por cada ID si existe
+        std::queue<Node*> recorrido;
+        std::unordered_set<ID> visitadosImportantes;
+        recorrido.push(raiz.get())
+        while (!recorrido.empty()){
+            auto Node = recorrido.top()
+            recorrido.pop()
+            if (Node->data.etiqueta == extension) {
+                auto a = espacio[Node->data.getID()].find(nombre)
+                if a != espacio.end() return a
+                }
+            for (const auto& elem: Node->hijos) recorrido.push(elem.get())
+        }
+    }
+
+private:
+    std::shared_ptr<Node<T>> raiz;
+    std::unordered_map<ID, std::unordered_set<FIC>> espacio;
+    ID Nombre;
+
+
+
+
+}
+typename T
+class ItereadorPar {
+    using Node = T::Node
+    using Type = T::Tipo
+    ItereadorPar () : {}
+    ItereadorPar (T tree): arbol{Tree}
+    ItereadorPar operator++(int){
+        auto temp = this*
+        operator++()
+        return this*
+    }
+    ItereadorPar&  operator++ () {
+        nodos.push(arbol.getRoot())
+        while (!nodos.empty()) {
+            auto nodoacc = nodos.top()
+            nodos.pop()
+            if(arbol.getLeftChild(nodoacc)){nodos.push(arbol.getLeftChild(nodoacc))}
+            if(arbol.getRightChild(nodoacc)){nodos.push(arbol.getRightChild(nodoacc))}
+
+            if (arbol.getElement(nodoacc) % 2 == 0) {
+                correctos.push_back(nodoacc)
+            }
+
+        }
+        return this* 
+
+    }
+    bool operator != () {
+        return (arbol.getElement(nodos.top()) != arbol.getElement(nodos.top()) )
+    } 
+    Node& operator* () {
+        return arbol.getElement(correctos.front())
+    }
+
+    private : 
+    std::list<Node*> correctos
+    std::stack<Node*> nodos
+    T arbol 
+}
 
